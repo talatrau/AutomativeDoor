@@ -28,7 +28,6 @@ public class Servo extends AppCompatActivity {
 
         adapter = new ServoAdapter(this, R.layout.stream_servo, servos);
         listView.setAdapter(adapter);
-        getSupportActionBar().hide();
     }
 
     private void associate() {
