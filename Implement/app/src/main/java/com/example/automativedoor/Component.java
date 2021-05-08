@@ -20,7 +20,7 @@ public class Component extends AppCompatActivity {
         setContentView(R.layout.activity_component);
         Log.e("Component in state: ", "onCreate");
 
-        associate();
+        this.associate();
 
         adapter = new ComponentAdapter(this, R.layout.stream_component, components);
         listView.setAdapter(adapter);

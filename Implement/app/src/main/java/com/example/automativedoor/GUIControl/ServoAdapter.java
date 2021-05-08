@@ -52,10 +52,10 @@ public class ServoAdapter extends BaseAdapter {
             convertView = inflater.inflate(layout, null);
             holder = new ViewHolder();
 
-            holder.txtName = convertView.findViewById(R.id.servo_name);
-            holder.txtID = convertView.findViewById(R.id.servo_id);
-            holder.open = convertView.findViewById(R.id.servo_open);
-            holder.close = convertView.findViewById(R.id.servo_close);
+            holder.txtName = (TextView) convertView.findViewById(R.id.servo_name);
+            holder.txtID = (TextView) convertView.findViewById(R.id.servo_id);
+            holder.open = (Button) convertView.findViewById(R.id.servo_open);
+            holder.close = (Button) convertView.findViewById(R.id.servo_close);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();

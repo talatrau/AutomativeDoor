@@ -46,10 +46,10 @@ public class ComponentAdapter extends BaseAdapter {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(layout, null);
-            holder = new ComponentAdapter.ViewHolder();
+            holder = new ViewHolder();
 
-            holder.txtName = convertView.findViewById(R.id.component_name);
-            holder.txtState = convertView.findViewById(R.id.component_state);
+            holder.txtName = (TextView) convertView.findViewById(R.id.component_name);
+            holder.txtState = (TextView) convertView.findViewById(R.id.component_state);
             holder.relativeLayout = (RelativeLayout) convertView.findViewById(R.id.component_layout);
             convertView.setTag(holder);
         } else {

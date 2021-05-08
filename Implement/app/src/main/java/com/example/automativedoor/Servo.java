@@ -20,11 +20,10 @@ public class Servo extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_servo);
         Log.e("Servo in state: ", "onCreate");
 
-        associate();
+        this.associate();
 
         adapter = new ServoAdapter(this, R.layout.stream_servo, servos);
         listView.setAdapter(adapter);
