@@ -1,8 +1,10 @@
 package com.example.automativedoor;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
 import android.widget.ListView;
 
 import com.example.automativedoor.GUIControl.ServoAdapter;
@@ -18,6 +20,7 @@ public class Servo extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_servo);
         Log.e("Servo in state: ", "onCreate");
 
@@ -25,7 +28,7 @@ public class Servo extends AppCompatActivity {
 
         adapter = new ServoAdapter(this, R.layout.stream_servo, servos);
         listView.setAdapter(adapter);
-
+        getSupportActionBar().hide();
     }
 
     private void associate() {

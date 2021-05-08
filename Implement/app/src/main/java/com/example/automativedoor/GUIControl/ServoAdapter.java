@@ -36,29 +36,39 @@ public class ServoAdapter extends BaseAdapter {
     @Override
     public Object getItem(int position) {
         return null;
-    }
+    }   // dont use
 
     @Override
     public long getItemId(int position) {
         return 0;
-    }
+    }       // dont use
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(layout, null);
+        ViewHolder holder;
 
-        TextView txtName = convertView.findViewById(R.id.servo_name);
-        Button open = convertView.findViewById(R.id.servo_open);
-        Button close = convertView.findViewById(R.id.servo_close);
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(layout, null);
+            holder = new ViewHolder();
+
+            holder.txtName = convertView.findViewById(R.id.servo_name);
+            holder.txtID = convertView.findViewById(R.id.servo_id);
+            holder.open = convertView.findViewById(R.id.servo_open);
+            holder.close = convertView.findViewById(R.id.servo_close);
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
 
         Servo servo = servos.get(position);
-        txtName.setText(servo.name);
+        holder.txtName.setText(servo.name);
+        holder.txtID.setText(servo.deviceID);
 
-        open.setOnClickListener(new View.OnClickListener() {
+        holder.open.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                open.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bounce));
+                holder.open.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bounce));
                 Toast notify;
                 if (!servo.getState()) {
                     notify = Toast.makeText(context.getApplicationContext(), "Door opened", Toast.LENGTH_SHORT);
@@ -73,10 +83,10 @@ public class ServoAdapter extends BaseAdapter {
             }
         });
 
-        close.setOnClickListener(new View.OnClickListener() {
+        holder.close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                close.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bounce));
+                holder.close.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bounce));
                 Toast notify;
                 if (servo.getState()) {
                     notify = Toast.makeText(context.getApplicationContext(), "Door closed", Toast.LENGTH_SHORT);
@@ -92,5 +102,12 @@ public class ServoAdapter extends BaseAdapter {
         });
 
         return convertView;
+    }
+
+    private class ViewHolder {
+        TextView txtName;
+        TextView txtID;
+        Button open;
+        Button close;
     }
 }
