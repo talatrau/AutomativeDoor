@@ -1,10 +1,10 @@
 package com.example.automativedoor.EntityClass;
 
-public class Servo extends Component {
-    private boolean state;  // 0 means close - 1 means open
+public class Sensor extends Component {
+    private boolean state;
 
-    public Servo(String devideID, String name, boolean state) {
-        super(devideID, name);
+    public Sensor(String Id, String name, boolean state) {
+        super(Id, name);
         this.state = state;
     }
 
@@ -24,10 +24,6 @@ public class Servo extends Component {
 
     @Override
     public void saveHistory() {
-        if (this.state) {
 
-        } else {
-
-        }
     }
 }

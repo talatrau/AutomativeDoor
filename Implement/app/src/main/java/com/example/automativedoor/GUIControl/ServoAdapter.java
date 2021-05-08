@@ -60,9 +60,9 @@ public class ServoAdapter extends BaseAdapter {
             public void onClick(View v) {
                 open.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bounce));
                 Toast notify;
-                if (!servo.GetState()) {
+                if (!servo.getState()) {
                     notify = Toast.makeText(context.getApplicationContext(), "Door opened", Toast.LENGTH_SHORT);
-                    servo.Toggle(true);
+                    servo.toggle(true);
                 } else {
                     notify = Toast.makeText(context.getApplicationContext(), "This door is already opened", Toast.LENGTH_SHORT);
                 }
@@ -78,9 +78,9 @@ public class ServoAdapter extends BaseAdapter {
             public void onClick(View v) {
                 close.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bounce));
                 Toast notify;
-                if (servo.GetState()) {
+                if (servo.getState()) {
                     notify = Toast.makeText(context.getApplicationContext(), "Door closed", Toast.LENGTH_SHORT);
-                    servo.Toggle(false);
+                    servo.toggle(false);
                 } else {
                     notify = Toast.makeText(context.getApplicationContext(), "This door is already closed", Toast.LENGTH_SHORT);
                 }
