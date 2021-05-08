@@ -1,4 +1,4 @@
-This folder encapsulates create GUI.
+This folder encapsulates GUI supporter.
 
 Add control GUI class here!
 
