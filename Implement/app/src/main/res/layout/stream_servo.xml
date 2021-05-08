@@ -39,7 +39,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="25sp"
         android:layout_margin="15dp"
-        android:background="@drawable/rounded"
+        android:background="@drawable/servo_rounded"
         android:textColor="@color/white" />
 
     <Button
@@ -51,7 +51,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="25sp"
         android:layout_margin="15dp"
-        android:background="@drawable/rounded"
+        android:background="@drawable/servo_rounded"
         android:textColor="@color/white" />
 
 </RelativeLayout>

@@ -1,11 +1,8 @@
 package com.example.automativedoor.EntityClass;
 
 public class Sensor extends Component {
-    private boolean state;
-
     public Sensor(String Id, String name, boolean state) {
-        super(Id, name);
-        this.state = state;
+        super(Id, name, state);
     }
 
     public boolean toggle(boolean signal) {
@@ -16,10 +13,6 @@ public class Sensor extends Component {
             this.saveHistory();
             return true;
         }
-    }
-
-    public boolean getState() {
-        return this.state;
     }
 
     @Override

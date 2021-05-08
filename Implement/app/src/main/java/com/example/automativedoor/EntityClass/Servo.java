@@ -1,11 +1,9 @@
 package com.example.automativedoor.EntityClass;
 
 public class Servo extends Component {
-    private boolean state;  // 0 means close - 1 means open
 
     public Servo(String devideID, String name, boolean state) {
-        super(devideID, name);
-        this.state = state;
+        super(devideID, name, state);
     }
 
     public boolean toggle(boolean signal) {
@@ -16,10 +14,6 @@ public class Servo extends Component {
             this.saveHistory();
             return true;
         }
-    }
-
-    public boolean getState() {
-        return this.state;
     }
 
     @Override

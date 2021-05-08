@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/component_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/component_on"
+        android:layout_marginTop="15sp">
+
+        <TextView
+            android:id="@+id/component_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="Cua truoc"
+            android:paddingLeft="20sp"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/component_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:paddingRight="20sp"
+            android:text="ON"
+            android:textSize="20sp"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

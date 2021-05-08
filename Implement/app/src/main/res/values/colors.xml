@@ -12,4 +12,6 @@
     <!-- material design style color -->
     <color name="blue_grey">#FF263238</color>
     <color name="blue_light">#FF1E88E5</color>
+    <color name="green">#FF00E676</color>
+    <color name="red">#FFD50000</color>
 </resources>
