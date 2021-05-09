@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<<<<<<< HEAD
+
 =======
     <!-- Default color -->
 >>>>>>> 3880ecd077dcf98ca2836fb2faa7d4aef162a043
@@ -11,7 +11,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-<<<<<<< HEAD
+
 =======
 
     <!-- material design style color -->
