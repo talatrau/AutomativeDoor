@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/blue_grey"
+    tools:context=".HomePage">
+
+    <TextView
+        android:id="@+id/smart_home"
+        android:textSize="40sp"
+        android:textColor="@color/white"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50sp"
+        android:layout_marginBottom="25sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Smart Home" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/smart_home"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_margin="10sp"
+            android:src="@drawable/homepage_smart_home" />
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50sp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/component_button"
+                android:layout_width="100sp"
+                android:layout_height="80sp"
+                android:src="@drawable/homepage_component"
+                android:background="@drawable/homepage_round_top"
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:scaleType="fitCenter" />
+
+            <ImageButton
+                android:id="@+id/history_button"
+                android:layout_width="100sp"
+                android:layout_height="80sp"
+                android:src="@drawable/homepage_history"
+                android:background="@drawable/homepage_round_top"
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:scaleType="fitCenter" />
+
+
+            <ImageButton
+                android:id="@+id/response_button"
+                android:layout_width="100sp"
+                android:layout_height="80sp"
+                android:src="@drawable/homepage_response"
+                android:background="@drawable/homepage_round_top"
+                android:layout_marginLeft="10sp"
+                android:scaleType="fitCenter" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="100sp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/homepage_round_bot"
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:paddingTop="15sp"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:text="Component\n"
+                android:clickable="true" />
+
+            <TextView
+                android:layout_width="100sp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/homepage_round_bot"
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:paddingTop="15sp"
+                android:textAlignment="center"
+                android:text="Activity History\n"
+                android:textSize="10sp"
+                android:textColor="@color/white"
+                android:clickable="true" />
+
+            <TextView
+                android:layout_width="100sp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/homepage_round_bot"
+                android:layout_marginLeft="10sp"
+                android:layout_marginRight="10sp"
+                android:paddingTop="15sp"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:text="Response\n"
+                android:clickable="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

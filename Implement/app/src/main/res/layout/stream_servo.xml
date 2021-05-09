@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/servo_name"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="abcxyz"/>
+
+        <TextView
+            android:id="@+id/servo_id"
+            android:textSize="10sp"
+            android:textColor="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="talatrau" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/servo_open"
+        android:text="Door Open"
+        android:textAlignment="center"
+        android:layout_width="100sp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="25sp"
+        android:layout_margin="15dp"
+        android:background="@drawable/servo_rounded"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/servo_close"
+        android:text="Door Close"
+        android:textAlignment="center"
+        android:layout_width="100sp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="25sp"
+        android:layout_margin="15dp"
+        android:background="@drawable/servo_rounded"
+        android:textColor="@color/white" />
+
+</RelativeLayout>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue_grey"
+    tools:context=".Component">
+
+    <ListView
+        android:id="@+id/component_listview"
+        android:layout_width="match_parent"
+        android:layout_height="300sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="35sp"
+        android:layout_marginLeft="25sp"
+        android:layout_marginRight="25sp">
+
+    </ListView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/component_listview"
+        android:layout_marginTop="50sp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/component_button"
+                android:layout_width="80sp"
+                android:layout_height="60sp"
+                android:src="@drawable/component_door"
+                android:background="@drawable/component_round_top"
+                android:layout_marginLeft="20sp"
+                android:layout_marginRight="20sp"
+                android:scaleType="fitCenter" />
+
+            <ImageButton
+                android:id="@+id/history_button"
+                android:layout_width="80sp"
+                android:layout_height="60sp"
+                android:src="@drawable/component_speaker"
+                android:background="@drawable/component_round_top"
+                android:layout_marginLeft="20sp"
+                android:layout_marginRight="20sp"
+                android:scaleType="fitCenter" />
+
+
+            <ImageButton
+                android:id="@+id/response_button"
+                android:layout_width="80sp"
+                android:layout_height="60sp"
+                android:src="@drawable/component_sensor"
+                android:background="@drawable/component_round_top"
+                android:layout_marginLeft="20sp"
+                android:scaleType="fitCenter" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="80sp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/component_round_bot"
+                android:layout_marginLeft="20sp"
+                android:layout_marginRight="20sp"
+                android:paddingTop="10sp"
+                android:textAlignment="center"
+                android:layout_gravity="center"
+                android:textColor="@color/black"
+                android:textSize="10sp"
+                android:text="Door"
+                android:clickable="true" />
+
+            <TextView
+                android:layout_width="80sp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/component_round_bot"
+                android:layout_marginLeft="20sp"
+                android:layout_marginRight="20sp"
+                android:paddingTop="10sp"
+                android:textAlignment="center"
+                android:layout_gravity="center"
+                android:textColor="@color/black"
+                android:textSize="10sp"
+                android:text="Speaker"
+                android:clickable="true" />
+
+            <TextView
+                android:layout_width="80sp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/component_round_bot"
+                android:layout_marginLeft="20sp"
+                android:layout_marginRight="20sp"
+                android:paddingTop="10sp"
+                android:textAlignment="center"
+                android:layout_gravity="center"
+                android:textColor="@color/black"
+                android:textSize="10sp"
+                android:text="Sensor"
+                android:clickable="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

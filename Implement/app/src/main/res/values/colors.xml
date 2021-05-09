@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<<<<<<< HEAD
+=======
+    <!-- Default color -->
+>>>>>>> 3880ecd077dcf98ca2836fb2faa7d4aef162a043
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,4 +11,13 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+<<<<<<< HEAD
+=======
+
+    <!-- material design style color -->
+    <color name="blue_grey">#FF263238</color>
+    <color name="blue_light">#FF1E88E5</color>
+    <color name="green">#FF00E676</color>
+    <color name="red">#FFD50000</color>
+>>>>>>> 3880ecd077dcf98ca2836fb2faa7d4aef162a043
 </resources>
