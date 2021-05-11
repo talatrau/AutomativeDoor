@@ -23,6 +23,9 @@
         </activity>
         <activity android:name=".forgot_pass" android:label="@string/forgot_pass" />
         <activity android:name=".HomePage" android:label="@string/homepage" />
+        <activity android:name=".Component" android:label="@string/component" />
+        <activity android:name=".feedback" android:label="@string/response" />
+        <activity android:name=".History" android:label="@string/history" />
     </application>
 
 </manifest>

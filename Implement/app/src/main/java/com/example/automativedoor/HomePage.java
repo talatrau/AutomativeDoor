@@ -9,15 +9,29 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.automativedoor.Control.UserController;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class HomePage extends AppCompatActivity {
 
     private boolean doubleBack = false;
+
+    private void componentClick() {
+        startActivity(new Intent(this, Component.class));
+    }
+
+    private void historyClick() {
+        startActivity(new Intent(this, History.class));
+    }
+
+    private void responseClick() {
+        startActivity(new Intent(this, feedback.class));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,16 +40,66 @@ public class HomePage extends AppCompatActivity {
         setContentView(R.layout.activity_home_page);
         Log.e("Homepage in state: ", "onCreate");
 
-        ImageButton button = (ImageButton) findViewById(R.id.component_button);
-        button.setOnClickListener(new View.OnClickListener() {
+        ImageButton component_bnt = (ImageButton) findViewById(R.id.component_button);
+        TextView component_txt = (TextView) findViewById(R.id.component_button_text);
+
+        component_txt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                button.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference reference = database.getReference("Account");
-                reference.setValue("cc ne ha");
-                Toast.makeText(HomePage.this, "ok", Toast.LENGTH_SHORT).show();
+                component_bnt.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
+                component_txt.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
+                componentClick();
+            }
+        });
 
+        component_bnt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                component_bnt.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
+                component_txt.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
+                componentClick();
+            }
+        });
+
+        ImageButton history_bnt = (ImageButton) findViewById(R.id.history_button);
+        TextView history_txt = (TextView) findViewById(R.id.history_button_text);
+
+        history_bnt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                history_bnt.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
+                history_txt.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
+                historyClick();
+            }
+        });
+
+        history_txt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                history_bnt.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
+                history_txt.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
+                historyClick();
+            }
+        });
+
+        ImageButton response_bnt = (ImageButton) findViewById(R.id.response_button);
+        TextView response_txt = (TextView) findViewById(R.id.response_button_text);
+
+        response_bnt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                response_bnt.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
+                response_txt.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
+                responseClick();
+            }
+        });
+
+        response_txt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                response_bnt.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
+                response_txt.startAnimation(AnimationUtils.loadAnimation(HomePage.this, R.anim.bounce));
+                responseClick();
             }
         });
     }
@@ -85,8 +149,9 @@ public class HomePage extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (this.doubleBack) {
-            UserController.logout();
+            UserController.fauth.signOut();
             startActivity(new Intent(getApplicationContext(), login.class));
+            finish();
         }
 
         this.doubleBack = true;

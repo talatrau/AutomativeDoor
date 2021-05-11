@@ -1,5 +1,7 @@
 package com.example.automativedoor.Control;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -11,8 +13,7 @@ import java.time.LocalDateTime;
 
 public class UserController implements IDatabaseDriver {
 
-    private final static FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-
+    final static public FirebaseAuth fauth = FirebaseAuth.getInstance();
 
     public void setSpeaker() {
 
@@ -62,29 +63,6 @@ public class UserController implements IDatabaseDriver {
 
     }
 
-
-    public static boolean login(String email, String pass) {
-        if (firebaseAuth.getCurrentUser() != null) {
-            return true;
-        } else if (email.isEmpty()) {
-            return false;
-        } else {
-
-            final boolean[] result = new boolean[1];
-            firebaseAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    result[0] = task.isSuccessful();
-                }
-            });
-
-            return result[0];
-        }
-    }
-
-    public static void logout() {
-        firebaseAuth.signOut();
-    }
 
     @Override
     public void writeJson() {

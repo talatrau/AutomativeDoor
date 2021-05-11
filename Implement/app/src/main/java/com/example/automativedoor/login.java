@@ -1,5 +1,9 @@
 package com.example.automativedoor;
 import com.example.automativedoor.Control.UserController;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,9 +11,11 @@ import android.content.Intent;
 import android.os.Bundle;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,13 +29,15 @@ import android.widget.Toast;
 
 public class login extends AppCompatActivity {
 
+    final private FirebaseAuth firebaseAuth = UserController.fauth;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        if (UserController.login("","")) {
-            Toast.makeText(login.this, "Welcome back!", Toast.LENGTH_SHORT).show();
+        if (firebaseAuth.getCurrentUser() != null) {
+            Toast.makeText(login.this, "Welcome back! " + firebaseAuth.getCurrentUser().getEmail().toString(), Toast.LENGTH_SHORT).show();
             startActivity(new Intent(getApplicationContext(), HomePage.class));
             finish();
         }
@@ -82,13 +90,18 @@ public class login extends AppCompatActivity {
                     return;
                 }
 
-                if (UserController.login(email, pass)) {
-                    Toast.makeText(login.this, "Welcome back!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(getApplicationContext(), HomePage.class));
-                    finish();
-                } else {
-                    Toast.makeText(login.this, "Error Email or Password! ", Toast.LENGTH_SHORT).show();
-                }
+                firebaseAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(login.this, "Welcome back! " + email, Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(getApplicationContext(), HomePage.class));
+                            finish();
+                        } else {
+                            Toast.makeText(login.this, "Error Email or Password! ", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
 

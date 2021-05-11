@@ -11,4 +11,7 @@
     <string name="login_failed">"Login failed"</string>
     <string name="forgot_pass">forgot_pass</string>
     <string name="homepage">Homepage</string>
+    <string name="component">Component</string>
+    <string name="response">Response</string>
+    <string name="history">History</string>
 </resources>
