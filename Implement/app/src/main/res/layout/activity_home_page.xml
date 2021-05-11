@@ -18,56 +18,8 @@
         android:layout_height="wrap_content"
         android:text="Smart Home" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/smart_home"
-        android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:layout_margin="10sp"
-            android:src="@drawable/homepage_smart_home" />
-
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50sp"
-            android:orientation="horizontal">
-
-            <ImageButton
-                android:id="@+id/component_button"
-                android:layout_width="100sp"
-                android:layout_height="80sp"
-                android:src="@drawable/homepage_component"
-                android:background="@drawable/homepage_round_top"
-                android:layout_marginLeft="10sp"
-                android:layout_marginRight="10sp"
-                android:scaleType="fitCenter" />
-
-            <ImageButton
-                android:id="@+id/history_button"
-                android:layout_width="100sp"
-                android:layout_height="80sp"
-                android:src="@drawable/homepage_history"
-                android:background="@drawable/homepage_round_top"
-                android:layout_marginLeft="10sp"
-                android:layout_marginRight="10sp"
-                android:scaleType="fitCenter" />
-
-
-            <ImageButton
-                android:id="@+id/response_button"
-                android:layout_width="100sp"
-                android:layout_height="80sp"
-                android:src="@drawable/homepage_response"
-                android:background="@drawable/homepage_round_top"
-                android:layout_marginLeft="10sp"
-                android:scaleType="fitCenter" />
-
+<<<<<<< HEAD
         </LinearLayout>
 
         <LinearLayout
@@ -116,8 +68,49 @@
                 android:textSize="10sp"
                 android:text="Response\n"
                 android:clickable="true" />
+=======
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/smart_home"
+        android:layout_marginTop="32dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/homepage_smart_home" />
+>>>>>>> a16632fada06e1f4b65a03c841130478e8ff5dea
 
-        </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="115dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="177dp"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <Button
+            android:id="@+id/servoBtn"
+            android:layout_width="0dp"
+            android:layout_height="115dp"
+            android:layout_weight="1"
+            android:layout_marginTop="-2dp"
+            android:drawableTop="@drawable/homepage_component"
+            android:text="Servo" />
+
+        <Button
+            android:id="@+id/buzzerBtn"
+            android:layout_width="0dp"
+            android:layout_height="115dp"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/homepage_history"
+            android:text="Buzzer" />
+
+        <Button
+            android:id="@+id/sensorBtn"
+            android:layout_width="0dp"
+            android:layout_height="115dp"
+            android:layout_weight="1"
+            android:layout_marginTop="-2dp"
+            android:drawableTop="@drawable/homepage_response"
+            android:text="Sensor" />
 
     </LinearLayout>
 
