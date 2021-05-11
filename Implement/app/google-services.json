@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1079969519866",
+    "firebase_url": "https://smarthome-8926e-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "smarthome-8926e",
+    "storage_bucket": "smarthome-8926e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079969519866:android:989608e40e667ef22a1143",
+        "android_client_info": {
+          "package_name": "com.example.automativedoor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1079969519866-j7mmeio81p7veqpobf2fdv3a0j4j11kf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZu7lVGJKe2IxXyD7-iICq5HL78N1MeeM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1079969519866-j7mmeio81p7veqpobf2fdv3a0j4j11kf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

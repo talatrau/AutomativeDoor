@@ -1,7 +1,6 @@
 package com.example.automativedoor.EntityClass;
 
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
