@@ -13,12 +13,13 @@
     tools:context=".forgot_pass">
 
     <EditText
-        android:id="@+id/username"
+        android:id="@+id/forgot_email"
         android:layout_width="300dp"
         android:layout_height="50dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="284dp"
         android:layout_marginEnd="24dp"
+        android:paddingLeft="15sp"
         android:background="@color/teal_700"
         android:hint="@string/prompt_email"
         android:inputType="textEmailAddress"
@@ -28,21 +29,22 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/password"
+        android:id="@+id/forgot_pin"
         android:layout_width="300dp"
         android:layout_height="50dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="24dp"
+        android:paddingLeft="15sp"
         android:background="@color/teal_700"
-        android:hint="@string/prompt_password"
+        android:hint="Pin code"
         android:imeActionLabel="@string/action_sign_in_short"
         android:imeOptions="actionDone"
         android:inputType="textPassword"
         android:selectAllOnFocus="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/username" />
+        app:layout_constraintTop_toBottomOf="@+id/forgot_email" />
 
     <Button
         android:id="@+id/login"

@@ -1,17 +1,23 @@
 package com.example.automativedoor;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.example.automativedoor.Control.UserController;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class HomePage extends AppCompatActivity {
+
+    private boolean doubleBack = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,5 +80,23 @@ public class HomePage extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.e("Homepage in state: ", "onDestroy");
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (this.doubleBack) {
+            UserController.logout();
+            startActivity(new Intent(getApplicationContext(), login.class));
+        }
+
+        this.doubleBack = true;
+        Toast.makeText(this, "Please click BACK again to logout", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBack = false;
+            }
+        }, 2000);
     }
 }
