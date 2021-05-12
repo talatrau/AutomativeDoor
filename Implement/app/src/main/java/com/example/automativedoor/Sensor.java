@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 
+import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.GUIControl.SensorAdapter;
 
 import java.util.ArrayList;
@@ -29,11 +30,7 @@ public class Sensor extends AppCompatActivity {
 
     private void associate() {
         listView = (ListView) findViewById(R.id.sensor_listview);
-        sensors = new ArrayList<>();
-
-        sensors.add(new com.example.automativedoor.EntityClass.Sensor("001", "cua truoc", true));
-        sensors.add(new com.example.automativedoor.EntityClass.Sensor("001", "cua sau", true));
-        sensors.add(new com.example.automativedoor.EntityClass.Sensor("001", "cua phong", false));
+        sensors = UserController.sensorList;
     }
 
     @Override

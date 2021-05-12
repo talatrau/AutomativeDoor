@@ -37,7 +37,8 @@ public class login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         if (firebaseAuth.getCurrentUser() != null) {
-            Toast.makeText(login.this, "Welcome back! " + firebaseAuth.getCurrentUser().getEmail().toString(), Toast.LENGTH_SHORT).show();
+            UserController.setup(firebaseAuth.getCurrentUser().getEmail());
+            Toast.makeText(login.this, "Welcome back! " + firebaseAuth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
             startActivity(new Intent(getApplicationContext(), HomePage.class));
             finish();
         }
@@ -55,19 +56,7 @@ public class login extends AppCompatActivity {
         contact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(login.this);
-                builder.setTitle("Contact us via");
-                builder.setMessage("\n Phone: \t 113-114-115 \n \n Eamil: \t abcxyz@yahoo.com");
-
-                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                AlertDialog al = builder.create();
-                al.show();
+                contactShow();
             }
         });
 
@@ -94,9 +83,15 @@ public class login extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(login.this, "Welcome back! " + email, Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(), HomePage.class));
-                            finish();
+                            if (UserController.setup(email)) {
+                                Toast.makeText(login.this, "Welcome back! " + email, Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(getApplicationContext(), HomePage.class));
+                                finish();
+                            } else {
+                                Toast.makeText(login.this, "Something went wrong! Please contact us for more information!", Toast.LENGTH_LONG).show();
+                                contactShow();
+                                firebaseAuth.signOut();
+                            }
                         } else {
                             Toast.makeText(login.this, "Error Email or Password! ", Toast.LENGTH_SHORT).show();
                         }
@@ -114,6 +109,22 @@ public class login extends AppCompatActivity {
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
         return super.dispatchTouchEvent(ev);
+    }
+
+    private void contactShow() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(login.this);
+        builder.setTitle("Contact us via");
+        builder.setMessage("\n Phone: \t 113-114-115 \n \n Eamil: \t abcxyz@yahoo.com");
+
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog al = builder.create();
+        al.show();
     }
 
 }

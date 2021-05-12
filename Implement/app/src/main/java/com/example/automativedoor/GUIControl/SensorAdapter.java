@@ -58,8 +58,8 @@ public class SensorAdapter extends BaseAdapter {
         }
 
         Sensor sensor = sensors.get(position);
-        holder.txtName.setText(sensor.name);
-        holder.aSwitch.setChecked(sensor.state);
+        holder.txtName.setText(sensor.getName());
+        holder.aSwitch.setChecked(sensor.getState());
 
         return convertView;
     }

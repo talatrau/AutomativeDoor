@@ -62,8 +62,8 @@ public class ServoAdapter extends BaseAdapter {
         }
 
         Servo servo = servos.get(position);
-        holder.txtName.setText(servo.name);
-        holder.txtID.setText(servo.deviceID);
+        holder.txtName.setText(servo.getName());
+        holder.txtID.setText(servo.getDeviceID());
 
         holder.open.setOnClickListener(new View.OnClickListener() {
             @Override

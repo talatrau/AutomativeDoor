@@ -57,7 +57,7 @@ public class ComponentAdapter extends BaseAdapter {
         }
 
         Component component = components.get(position);
-        holder.txtName.setText(component.name);
+        holder.txtName.setText(component.getName());
         if (component.getState()) {
             holder.txtState.setText("ON");
             holder.relativeLayout.setBackgroundResource(R.drawable.component_on);

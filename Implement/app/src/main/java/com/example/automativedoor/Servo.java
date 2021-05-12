@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 
+import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.GUIControl.ServoAdapter;
 
 import java.util.ArrayList;
@@ -30,11 +31,7 @@ public class Servo extends AppCompatActivity {
 
     private void associate() {
         listView = (ListView) findViewById(R.id.servo_listview);
-        servos = new ArrayList<>();
-
-        servos.add(new com.example.automativedoor.EntityClass.Servo("001", "cua truoc", true));
-        servos.add(new com.example.automativedoor.EntityClass.Servo("001", "cua sau", true));
-        servos.add(new com.example.automativedoor.EntityClass.Servo("001", "cua phong", true));
+        servos = UserController.servoList;
     }
 
     @Override

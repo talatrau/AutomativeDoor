@@ -30,7 +30,7 @@
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/component_button"
+                android:id="@+id/component_servo_btn"
                 android:layout_width="80sp"
                 android:layout_height="60sp"
                 android:src="@drawable/component_door"
@@ -40,7 +40,7 @@
                 android:scaleType="fitCenter" />
 
             <ImageButton
-                android:id="@+id/history_button"
+                android:id="@+id/component_speaker_btm"
                 android:layout_width="80sp"
                 android:layout_height="60sp"
                 android:src="@drawable/component_speaker"
@@ -51,7 +51,7 @@
 
 
             <ImageButton
-                android:id="@+id/response_button"
+                android:id="@+id/component_sensor_btn"
                 android:layout_width="80sp"
                 android:layout_height="60sp"
                 android:src="@drawable/component_sensor"
@@ -67,6 +67,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/component_servo_text"
                 android:layout_width="80sp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/component_round_bot"
@@ -81,6 +82,7 @@
                 android:clickable="true" />
 
             <TextView
+                android:id="@+id/component_speaker_text"
                 android:layout_width="80sp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/component_round_bot"
@@ -95,6 +97,7 @@
                 android:clickable="true" />
 
             <TextView
+                android:id="@+id/component_sensor_text"
                 android:layout_width="80sp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/component_round_bot"

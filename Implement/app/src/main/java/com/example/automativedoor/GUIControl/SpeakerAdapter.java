@@ -56,7 +56,7 @@ public class SpeakerAdapter extends BaseAdapter {
         }
 
         Speaker speaker = speakers.get(position);
-        holder.txtName.setText(speaker.name);
+        holder.txtName.setText(speaker.getName());
         holder.seekBar.setProgress(speaker.getVolume());
 
         return convertView;
