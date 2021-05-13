@@ -29,16 +29,16 @@ import android.widget.Toast;
 
 public class login extends AppCompatActivity {
 
-    final private FirebaseAuth firebaseAuth = UserController.fauth;
+    private UserController controller = UserController.getInstance();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        if (firebaseAuth.getCurrentUser() != null) {
-            UserController.setup(firebaseAuth.getCurrentUser().getEmail());
-            Toast.makeText(login.this, "Welcome back! " + firebaseAuth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
+        if (controller.fauth.getCurrentUser() != null) {
+            controller.setup();
+            Toast.makeText(login.this, "Welcome back! " + controller.fauth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
             startActivity(new Intent(getApplicationContext(), HomePage.class));
             finish();
         }
@@ -79,18 +79,18 @@ public class login extends AppCompatActivity {
                     return;
                 }
 
-                firebaseAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                controller.fauth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            if (UserController.setup(email)) {
+                            if (controller.setup()) {
                                 Toast.makeText(login.this, "Welcome back! " + email, Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(getApplicationContext(), HomePage.class));
                                 finish();
                             } else {
                                 Toast.makeText(login.this, "Something went wrong! Please contact us for more information!", Toast.LENGTH_LONG).show();
                                 contactShow();
-                                firebaseAuth.signOut();
+                                controller.fauth.signOut();
                             }
                         } else {
                             Toast.makeText(login.this, "Error Email or Password! ", Toast.LENGTH_SHORT).show();

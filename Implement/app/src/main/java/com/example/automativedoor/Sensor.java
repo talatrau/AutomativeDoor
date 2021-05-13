@@ -12,9 +12,14 @@ import java.util.ArrayList;
 
 public class Sensor extends AppCompatActivity {
 
-    ListView listView;
-    ArrayList<com.example.automativedoor.EntityClass.Sensor> sensors;
-    SensorAdapter adapter;
+    private ListView listView;
+
+    private ArrayList<com.example.automativedoor.EntityClass.Sensor> sensors;
+
+    private SensorAdapter adapter;
+
+    private UserController controller = UserController.getInstance();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +35,7 @@ public class Sensor extends AppCompatActivity {
 
     private void associate() {
         listView = (ListView) findViewById(R.id.sensor_listview);
-        sensors = UserController.sensorList;
+        sensors = controller.sensorList;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.automativedoor.GUIControl;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,8 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
 
 import com.example.automativedoor.EntityClass.Sensor;
 import com.example.automativedoor.R;
@@ -60,6 +63,14 @@ public class SensorAdapter extends BaseAdapter {
         Sensor sensor = sensors.get(position);
         holder.txtName.setText(sensor.getName());
         holder.aSwitch.setChecked(sensor.getState());
+
+        holder.aSwitch.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onClick(View v) {
+                sensor.toggle(holder.aSwitch.isChecked());
+            }
+        });
 
         return convertView;
     }

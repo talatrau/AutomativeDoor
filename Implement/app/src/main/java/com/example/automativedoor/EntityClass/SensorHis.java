@@ -1,51 +1,52 @@
 package com.example.automativedoor.EntityClass;
 
+import android.os.Build;
+
 import androidx.annotation.RequiresApi;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SensorHis extends History {
-    public LocalDateTime sTime;
-    public LocalDateTime eTime;
-    public String period;
-    public List<String> obstacle;
+    public String sTime;
+    public String eTime;
+    public List<String> obstacle = new ArrayList<String>();
 
-    public SensorHis(String id, String name, LocalDateTime sTime, LocalDateTime eTime, List<String> obstacle) {
-        super(id, name);
-        this.sTime = sTime;
-        this.eTime = eTime;
-        this.obstacle = obstacle;
-        this.distance();
-    }
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public String getPeriod() {
+        // TODO return distance between start and end time
+        String distance = "";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddTHH:mm:ss");
+        LocalDateTime start = LocalDateTime.parse(this.sTime, formatter);
+        LocalDateTime end = LocalDateTime.parse(this.eTime, formatter);
 
-    private void distance() {
-        this.period = "";
-        LocalDateTime temp = LocalDateTime.from(this.sTime);
+        LocalDateTime fromTemp = LocalDateTime.from(start);
+        long years = fromTemp.until(end, ChronoUnit.YEARS);
+        fromTemp = fromTemp.plusYears(years);
+        if (years > 0) distance += String.valueOf(years) + " years ";
 
-        long years = temp.until(this.eTime, ChronoUnit.YEARS);
-        if (years > 0) this.period += years + " years ";
-        temp = temp.plusYears(years);
+        long months = fromTemp.until(end, ChronoUnit.MONTHS);
+        fromTemp = fromTemp.plusMonths(months);
+        if (months > 0) distance += String.valueOf(months) + " months ";
 
-        long months = temp.until(this.eTime, ChronoUnit.MONTHS);
-        if (months > 0) this.period += months + " months ";
-        temp = temp.plusMonths(months);
+        long days = fromTemp.until(end, ChronoUnit.DAYS);
+        fromTemp = fromTemp.plusDays(days);
+        if (days > 0) distance += String.valueOf(days) + " days ";
 
-        long days = temp.until(this.eTime, ChronoUnit.DAYS);
-        if (days > 0) this.period += days + " days ";
-        temp = temp.plusDays(days);
+        long hours = fromTemp.until(end, ChronoUnit.HOURS);
+        fromTemp = fromTemp.plusHours(hours);
+        if (hours > 0) distance += String.valueOf(hours) + " hours ";
 
-        long hours = temp.until(this.eTime, ChronoUnit.HOURS);
-        if (hours > 0) this.period += hours + " hours ";
-        temp = temp.plusHours(hours);
+        long minutes = fromTemp.until(end, ChronoUnit.MINUTES);
+        fromTemp = fromTemp.plusMinutes(minutes);
+        if (minutes > 0) distance += String.valueOf(minutes) + " minutes ";
 
-        long minutes = temp.until(this.eTime, ChronoUnit.MINUTES);
-        if (minutes > 0) this.period += minutes + " minutes ";
-        temp = temp.plusMinutes(minutes);
+        long seconds = fromTemp.until(end, ChronoUnit.SECONDS);
+        distance += String.valueOf(seconds) + " senconds";
 
-        long seconds = temp.until(this.eTime, ChronoUnit.SECONDS);
-        this.period += seconds + " seconds";
-
+        return distance;
     }
 }

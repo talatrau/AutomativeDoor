@@ -21,9 +21,14 @@ import com.example.automativedoor.GUIControl.ComponentAdapter;
 import java.util.ArrayList;
 
 public class Component extends AppCompatActivity {
-    ListView listView;
-    ArrayList<com.example.automativedoor.EntityClass.Component> components;
-    ComponentAdapter adapter;
+    private ListView listView;
+
+    private ArrayList<com.example.automativedoor.EntityClass.Component> components;
+
+    private ComponentAdapter adapter;
+
+    private UserController controller = UserController.getInstance();
+
 
     private void sensorClick() { startActivity(new Intent(this, com.example.automativedoor.Sensor.class)); }
 
@@ -114,15 +119,15 @@ public class Component extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.component_listview);
         components = new ArrayList<com.example.automativedoor.EntityClass.Component>();
 
-        for (Sensor sensor : UserController.sensorList) {
+        for (Sensor sensor : controller.sensorList) {
             components.add(sensor);
         }
 
-        for (Speaker speaker : UserController.speakerList) {
+        for (Speaker speaker : controller.speakerList) {
             components.add(speaker);
         }
 
-        for (Servo servo : UserController.servoList) {
+        for (Servo servo : controller.servoList) {
             components.add(servo);
         }
 
@@ -151,6 +156,8 @@ public class Component extends AppCompatActivity {
         super.onRestart();
         Log.e("Component in state: ", "onRestart");
         this.associate();
+        adapter = new ComponentAdapter(this, R.layout.stream_component, components);
+        listView.setAdapter(adapter);
     }
 
     @Override

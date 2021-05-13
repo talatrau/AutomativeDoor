@@ -19,6 +19,9 @@ public class HomePage extends AppCompatActivity {
 
     private boolean doubleBack = false;
 
+    private UserController controller = UserController.getInstance();
+
+
     private void componentClick() {
         startActivity(new Intent(this, Component.class));
     }
@@ -152,7 +155,7 @@ public class HomePage extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (this.doubleBack) {
-            UserController.fauth.signOut();
+            controller.fauth.signOut();
             startActivity(new Intent(getApplicationContext(), login.class));
             finish();
         }

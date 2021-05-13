@@ -12,9 +12,14 @@ import java.util.ArrayList;
 
 public class Speaker extends AppCompatActivity {
 
-    ListView listView;
-    ArrayList<com.example.automativedoor.EntityClass.Speaker> speakers;
-    SpeakerAdapter adapter;
+    private ListView listView;
+
+    private ArrayList<com.example.automativedoor.EntityClass.Speaker> speakers;
+
+    private SpeakerAdapter adapter;
+
+    private UserController controller = UserController.getInstance();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +35,7 @@ public class Speaker extends AppCompatActivity {
 
     private void associate() {
         listView = (ListView) findViewById(R.id.speaker_listview);
-        speakers = UserController.speakerList;
+        speakers = controller.speakerList;
     }
 
     @Override

@@ -13,9 +13,14 @@ import java.util.ArrayList;
 
 public class Servo extends AppCompatActivity {
 
-    ListView listView;
-    ArrayList<com.example.automativedoor.EntityClass.Servo> servos;
-    ServoAdapter adapter;
+    private ListView listView;
+
+    private ArrayList<com.example.automativedoor.EntityClass.Servo> servos;
+
+    private ServoAdapter adapter;
+
+    private UserController controller = UserController.getInstance();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +36,7 @@ public class Servo extends AppCompatActivity {
 
     private void associate() {
         listView = (ListView) findViewById(R.id.servo_listview);
-        servos = UserController.servoList;
+        servos = controller.servoList;
     }
 
     @Override
