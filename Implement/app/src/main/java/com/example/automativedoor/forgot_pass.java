@@ -26,6 +26,7 @@ public class forgot_pass extends AppCompatActivity {
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
         return super.dispatchTouchEvent(ev);
+
     }
 
 }
