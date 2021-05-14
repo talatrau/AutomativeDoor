@@ -46,9 +46,13 @@ public class HistoryAdapter extends BaseAdapter {
         convertView = inflater.inflate(layout, null);
         History history = listHistory.get(position);
 
-        TextView activity = convertView.findViewById(R.id.activity);
-        TextView date = convertView.findViewById(R.id.date);
-        TextView time = convertView.findViewById(R.id.time);
+        TextView dateStart = convertView.findViewById(R.id.dateStart);
+        TextView timeStart = convertView.findViewById(R.id.timeStart);
+
+        TextView dateEnd = convertView.findViewById(R.id.dateEnd);
+        TextView timeEnd = convertView.findViewById(R.id.timeEnd);
+
+
 
 //        activity.setText();
         return null;

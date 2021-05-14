@@ -8,4 +8,5 @@ public abstract class History {
         this.deviceID = deviceID;
         this.name = name;
     }
+    public abstract String getHistory();
 }
