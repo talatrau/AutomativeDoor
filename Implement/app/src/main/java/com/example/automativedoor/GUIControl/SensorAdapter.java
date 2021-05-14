@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.EntityClass.Sensor;
 import com.example.automativedoor.R;
 
@@ -68,7 +69,8 @@ public class SensorAdapter extends BaseAdapter {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-                sensor.toggle(holder.aSwitch.isChecked());
+                if (holder.aSwitch.isChecked()) { UserController.getInstance().turnOnSensor(position); }
+                else UserController.getInstance().turnOffSensor(position);
             }
         });
 

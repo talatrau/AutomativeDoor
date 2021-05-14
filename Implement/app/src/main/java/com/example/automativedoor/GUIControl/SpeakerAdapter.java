@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.EntityClass.Speaker;
 import com.example.automativedoor.R;
 
@@ -78,8 +79,7 @@ public class SpeakerAdapter extends BaseAdapter {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                speaker.changeVolume(progressChangedValue);
-                speaker.alarm(30);
+                UserController.getInstance().setSpeaker(position, progressChangedValue);
             }
         });
 

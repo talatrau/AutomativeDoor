@@ -1,6 +1,7 @@
 package com.example.automativedoor.EntityClass;
 
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -37,7 +38,7 @@ public class Sensor extends Component {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void saveObstacle() {
-        this.sensorHis.obstacle.add(LocalDateTime.now().toString().substring(0, 19));
+        //this.sensorHis.obstacle.add(LocalDateTime.now().toString().substring(0, 19));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

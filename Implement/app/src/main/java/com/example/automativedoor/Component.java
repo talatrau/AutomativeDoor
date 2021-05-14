@@ -118,7 +118,7 @@ public class Component extends AppCompatActivity {
     private void associate() {
         listView = (ListView) findViewById(R.id.component_listview);
         components = new ArrayList<com.example.automativedoor.EntityClass.Component>();
-
+        Log.e("case", "associate");
         for (Sensor sensor : controller.sensorList) {
             components.add(sensor);
         }
@@ -136,25 +136,25 @@ public class Component extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.e("Component in state: ", "onResume");
+//        Log.e("Component in state: ", "onResume");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.e("Component in state: ", "onStart");
+//        Log.e("Component in state: ", "onStart");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.e("Component in state: ", "onStop");
+//        Log.e("Component in state: ", "onStop");
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.e("Component in state: ", "onRestart");
+//        Log.e("Component in state: ", "onRestart");
         this.associate();
         adapter = new ComponentAdapter(this, R.layout.stream_component, components);
         listView.setAdapter(adapter);
@@ -163,18 +163,18 @@ public class Component extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.e("Component in state: ", "onPause");
+//        Log.e("Component in state: ", "onPause");
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.e("Component in state: ", "onSaveInstance");
+//        Log.e("Component in state: ", "onSaveInstance");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e("Component in state: ", "onDestroy");
+//        Log.e("Component in state: ", "onDestroy");
     }
 }

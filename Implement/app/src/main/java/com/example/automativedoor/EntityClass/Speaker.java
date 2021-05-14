@@ -50,6 +50,5 @@ public class Speaker extends Component {
         speakerHis.time = LocalDateTime.now().toString().substring(0, 19);
         DatabaseReference reference = database.getReference("SpeakerHis").child(UserController.getInstance().getHash()).child(this.deviceID).child(String.valueOf(this.currentHis));
         reference.setValue(this.speakerHis);
-        this.currentHis += 1;
     }
 }

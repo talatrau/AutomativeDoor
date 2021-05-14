@@ -13,11 +13,10 @@ import java.util.List;
 public class SensorHis extends History {
     public String sTime;
     public String eTime;
-    public List<String> obstacle = new ArrayList<String>();
+    public List<String> obstacle;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public String getPeriod() {
-        // TODO return distance between start and end time
+    public String timeDistance() {
         String distance = "";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddTHH:mm:ss");
         LocalDateTime start = LocalDateTime.parse(this.sTime, formatter);
@@ -47,6 +46,6 @@ public class SensorHis extends History {
         long seconds = fromTemp.until(end, ChronoUnit.SECONDS);
         distance += String.valueOf(seconds) + " senconds";
 
-        return distance;
+        return distance;        // return distance between start and end time
     }
 }

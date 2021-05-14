@@ -1,6 +1,7 @@
 package com.example.automativedoor.GUIControl;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+
+import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.EntityClass.Servo;
 import com.example.automativedoor.R;
 
@@ -66,13 +70,13 @@ public class ServoAdapter extends BaseAdapter {
         holder.txtID.setText(servo.getDeviceID());
 
         holder.open.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 holder.open.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bounce));
                 Toast notify;
-                if (!servo.getState()) {
+                if (UserController.getInstance().openDoor(position)) {
                     notify = Toast.makeText(context.getApplicationContext(), "Door opened", Toast.LENGTH_SHORT);
-                    servo.toggle(true);
                 } else {
                     notify = Toast.makeText(context.getApplicationContext(), "This door is already opened", Toast.LENGTH_SHORT);
                 }
@@ -84,13 +88,13 @@ public class ServoAdapter extends BaseAdapter {
         });
 
         holder.close.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 holder.close.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bounce));
                 Toast notify;
-                if (servo.getState()) {
+                if (UserController.getInstance().closeDoor(position)) {
                     notify = Toast.makeText(context.getApplicationContext(), "Door closed", Toast.LENGTH_SHORT);
-                    servo.toggle(false);
                 } else {
                     notify = Toast.makeText(context.getApplicationContext(), "This door is already closed", Toast.LENGTH_SHORT);
                 }
