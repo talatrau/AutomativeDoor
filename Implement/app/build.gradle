@@ -7,6 +7,15 @@ plugins {
 
 android {
 
+    allprojects {
+        repositories {
+            maven { url 'https://jitpack.io' }
+            maven {
+                url "https://repo.eclipse.org/content/repositories/paho−snapshots/"
+            }
+        }
+    }
+
     defaultConfig {
         applicationId "com.example.automativedoor"
         minSdkVersion 23
@@ -51,6 +60,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:19.7.0'
     implementation platform('com.google.firebase:firebase-bom:27.1.0')
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
+
+    implementation 'com.github.mik3y:usb-serial-for-android:2.+'
+    implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
