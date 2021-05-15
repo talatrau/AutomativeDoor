@@ -5,8 +5,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 
+import com.example.automativedoor.Control.MQTTServer;
 import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.GUIControl.SensorAdapter;
+
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.util.ArrayList;
 
@@ -20,6 +25,8 @@ public class Sensor extends AppCompatActivity {
 
     private UserController controller = UserController.getInstance();
 
+    MQTTServer mqttServer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,14 +35,41 @@ public class Sensor extends AppCompatActivity {
         Log.e("Sensor in state: ", "onCreate");
 
         this.associate();
+        this.setMqtt();
 
-        adapter = new SensorAdapter(this, R.layout.stream_sensor, sensors);
+        adapter = new SensorAdapter(this, R.layout.stream_sensor, sensors, mqttServer);
         listView.setAdapter(adapter);
+
     }
 
     private void associate() {
         listView = (ListView) findViewById(R.id.sensor_listview);
         sensors = controller.sensorList;
+    }
+
+    private void setMqtt() {
+        this.mqttServer = new MQTTServer(this);
+        mqttServer.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean reconnect, String serverURI) {
+
+            }
+
+            @Override
+            public void connectionLost(Throwable cause) {
+
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
+
+            }
+        });
     }
 
     @Override

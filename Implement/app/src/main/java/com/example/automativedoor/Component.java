@@ -7,11 +7,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.automativedoor.Control.MQTTServer;
 import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.EntityClass.Sensor;
 import com.example.automativedoor.EntityClass.Servo;
@@ -35,6 +35,7 @@ public class Component extends AppCompatActivity {
     private void speakerClick() { startActivity(new Intent(this, com.example.automativedoor.Speaker.class)); }
 
     private void servoClick() { startActivity(new Intent(this, com.example.automativedoor.Servo.class)); }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +119,6 @@ public class Component extends AppCompatActivity {
     private void associate() {
         listView = (ListView) findViewById(R.id.component_listview);
         components = new ArrayList<com.example.automativedoor.EntityClass.Component>();
-        Log.e("case", "associate");
         for (Sensor sensor : controller.sensorList) {
             components.add(sensor);
         }
@@ -177,4 +177,6 @@ public class Component extends AppCompatActivity {
         super.onDestroy();
 //        Log.e("Component in state: ", "onDestroy");
     }
+
+
 }
