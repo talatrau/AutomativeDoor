@@ -26,6 +26,11 @@
         <activity android:name=".Component" android:label="@string/component" />
         <activity android:name=".feedback" android:label="@string/response" />
         <activity android:name=".History" android:label="@string/history" />
+        <activity android:name=".GeneralHistory" android:label="GeneralHistory" />
+        <activity android:name=".HistoryDetail" android:label="HistoryDetail" />
+        <activity android:name=".Sensor" android:label="@string/sensor" />
+        <activity android:name=".Servo" android:label="@string/servo" />
+        <activity android:name=".Speaker" android:label="@string/speaker" />
     </application>
 
 </manifest>

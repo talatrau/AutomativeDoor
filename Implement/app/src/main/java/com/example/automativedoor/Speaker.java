@@ -5,15 +5,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 
+import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.GUIControl.SpeakerAdapter;
 
 import java.util.ArrayList;
 
 public class Speaker extends AppCompatActivity {
 
-    ListView listView;
-    ArrayList<com.example.automativedoor.EntityClass.Speaker> speakers;
-    SpeakerAdapter adapter;
+    private ListView listView;
+
+    private ArrayList<com.example.automativedoor.EntityClass.Speaker> speakers;
+
+    private SpeakerAdapter adapter;
+
+    private UserController controller = UserController.getInstance();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +35,7 @@ public class Speaker extends AppCompatActivity {
 
     private void associate() {
         listView = (ListView) findViewById(R.id.speaker_listview);
-        speakers = new ArrayList<>();
-
-        speakers.add(new com.example.automativedoor.EntityClass.Speaker("001", "loa truoc", 100));
-        speakers.add(new com.example.automativedoor.EntityClass.Speaker("001", "loa sau", 20));
-        speakers.add(new com.example.automativedoor.EntityClass.Speaker("001", "loa phong", 50));
+        speakers = controller.speakerList;
     }
 
     @Override

@@ -19,6 +19,9 @@ public class HomePage extends AppCompatActivity {
 
     private boolean doubleBack = false;
 
+    private UserController controller = UserController.getInstance();
+
+
     private void componentClick() {
         startActivity(new Intent(this, Component.class));
     }
@@ -32,7 +35,6 @@ public class HomePage extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +42,10 @@ public class HomePage extends AppCompatActivity {
         setContentView(R.layout.activity_home_page);
         Log.e("Homepage in state: ", "onCreate");
 
+        this.setUpButtonEvent();
+    }
+
+    private void setUpButtonEvent() {
         ImageButton component_bnt = (ImageButton) findViewById(R.id.component_button);
         TextView component_txt = (TextView) findViewById(R.id.component_button_text);
 
@@ -149,7 +155,7 @@ public class HomePage extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (this.doubleBack) {
-            UserController.fauth.signOut();
+            controller.fauth.signOut();
             startActivity(new Intent(getApplicationContext(), login.class));
             finish();
         }

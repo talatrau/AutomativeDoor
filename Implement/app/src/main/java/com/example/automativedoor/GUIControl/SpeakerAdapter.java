@@ -1,6 +1,7 @@
 package com.example.automativedoor.GUIControl;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+
+import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.EntityClass.Speaker;
 import com.example.automativedoor.R;
 
@@ -56,8 +60,28 @@ public class SpeakerAdapter extends BaseAdapter {
         }
 
         Speaker speaker = speakers.get(position);
-        holder.txtName.setText(speaker.name);
+        holder.txtName.setText(speaker.getName());
         holder.seekBar.setProgress(speaker.getVolume());
+
+        holder.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int progressChangedValue = 0;
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progressChangedValue = progress;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                UserController.getInstance().setSpeaker(position, progressChangedValue);
+            }
+        });
 
         return convertView;
     }

@@ -1,6 +1,8 @@
 package com.example.automativedoor.EntityClass;
 
-public abstract class History {
+import android.util.Log;
+
+public class History {
     public String deviceID;
     public String name;
 
@@ -8,5 +10,13 @@ public abstract class History {
         this.deviceID = deviceID;
         this.name = name;
     }
-    public abstract String getHistory();
+    public String getStartTime(){
+        Log.wtf("History", "getStart");
+        return "history";
+    }
+    public String getEndTime(){
+        Log.wtf("History", "getEndTime");
+        return "history";
+    }
+
 }

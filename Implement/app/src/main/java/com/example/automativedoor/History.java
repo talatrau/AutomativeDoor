@@ -1,43 +1,38 @@
 package com.example.automativedoor;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.naishadhparmar.zcustomcalendar.CustomCalendar;
+import org.naishadhparmar.zcustomcalendar.OnDateSelectedListener;
 import org.naishadhparmar.zcustomcalendar.Property;
 
 import java.util.Calendar;
 import java.util.HashMap;
 
 public class History extends AppCompatActivity {
-    CustomCalendar customCalendar;
+    Button servoBtn, buzzerBtn, sensorBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_history_activity);
 
-        customCalendar = findViewById(R.id.custome_calendar);
+        servoBtn = (Button) findViewById(R.id.servoBtn);
+        buzzerBtn = (Button) findViewById(R.id.buzzerBtn);
+        sensorBtn = (Button) findViewById(R.id.sensorBtn);
 
-        HashMap<Object, Property> desHashMap = new HashMap<>();
-        Property defaultPropety = new Property();
-        defaultPropety.layoutResource = R.layout.default_view;
-        defaultPropety.dateTextViewResource = R.id.text_view;
-        desHashMap.put("default", defaultPropety);
-
-        // for pressed date
-        Property currentPropety = new Property();
-        currentPropety.layoutResource = R.layout.current_view;
-        currentPropety.dateTextViewResource = R.id.text_view;
-        desHashMap.put("pressed", currentPropety);
-
-        customCalendar.setMapDescToProp(desHashMap);
-
-        HashMap<Integer, Object> dateHashMap = new HashMap<>();
-        Calendar calendar = Calendar.getInstance();
-        
-
+        servoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(History.this, GeneralHistory.class));
+            }
+        });
 
     }
 }

@@ -5,49 +5,63 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SensorHis extends History {
-    public LocalDateTime sTime;
-    public LocalDateTime eTime;
-    public String period;
+    public String sTime;
+    public String eTime;
     public List<String> obstacle;
 
-    public SensorHis(String id, String name, LocalDateTime sTime, LocalDateTime eTime, List<String> obstacle) {
-        super(id, name);
-        this.sTime = sTime;
-        this.eTime = eTime;
-        this.obstacle = obstacle;
-        this.distance();
+    public SensorHis() {
+        super("1", "no");
     }
 
-    private void distance() {
-        this.period = "";
-        LocalDateTime temp = LocalDateTime.from(this.sTime);
 
-        long years = temp.until(this.eTime, ChronoUnit.YEARS);
-        if (years > 0) this.period += years + " years ";
-        temp = temp.plusYears(years);
 
-        long months = temp.until(this.eTime, ChronoUnit.MONTHS);
-        if (months > 0) this.period += months + " months ";
-        temp = temp.plusMonths(months);
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public String timeDistance() {
+        String distance = "";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-ddTHH:mm:ss");
+        LocalDateTime start = LocalDateTime.parse(this.sTime, formatter);
+        LocalDateTime end = LocalDateTime.parse(this.eTime, formatter);
 
-        long days = temp.until(this.eTime, ChronoUnit.DAYS);
-        if (days > 0) this.period += days + " days ";
-        temp = temp.plusDays(days);
+        LocalDateTime fromTemp = LocalDateTime.from(start);
+        long years = fromTemp.until(end, ChronoUnit.YEARS);
+        fromTemp = fromTemp.plusYears(years);
+        if (years > 0) distance += String.valueOf(years) + " years ";
 
-        long hours = temp.until(this.eTime, ChronoUnit.HOURS);
-        if (hours > 0) this.period += hours + " hours ";
-        temp = temp.plusHours(hours);
+        long months = fromTemp.until(end, ChronoUnit.MONTHS);
+        fromTemp = fromTemp.plusMonths(months);
+        if (months > 0) distance += String.valueOf(months) + " months ";
 
-        long minutes = temp.until(this.eTime, ChronoUnit.MINUTES);
-        if (minutes > 0) this.period += minutes + " minutes ";
-        temp = temp.plusMinutes(minutes);
+        long days = fromTemp.until(end, ChronoUnit.DAYS);
+        fromTemp = fromTemp.plusDays(days);
+        if (days > 0) distance += String.valueOf(days) + " days ";
 
-        long seconds = temp.until(this.eTime, ChronoUnit.SECONDS);
-        this.period += seconds + " seconds";
+        long hours = fromTemp.until(end, ChronoUnit.HOURS);
+        fromTemp = fromTemp.plusHours(hours);
+        if (hours > 0) distance += String.valueOf(hours) + " hours ";
 
+        long minutes = fromTemp.until(end, ChronoUnit.MINUTES);
+        fromTemp = fromTemp.plusMinutes(minutes);
+        if (minutes > 0) distance += String.valueOf(minutes) + " minutes ";
+
+        long seconds = fromTemp.until(end, ChronoUnit.SECONDS);
+        distance += String.valueOf(seconds) + " senconds";
+
+        return distance;        // return distance between start and end time
+    }
+
+    @Override
+    public String getStartTime() {
+        return sTime;
+    }
+
+    @Override
+    public String getEndTime() {
+        return eTime;
     }
 }
