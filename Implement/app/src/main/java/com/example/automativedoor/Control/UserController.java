@@ -157,6 +157,7 @@ public class UserController {
 
         try {
             mqttServer.mqttAndroidClient.publish(feedPath, msg);
+            Log.e("taatrau", "ok");
         } catch (Exception e) {
             Log.e("Exception", e.toString());
         }

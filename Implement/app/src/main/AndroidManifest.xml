@@ -39,6 +39,7 @@
         <activity android:name=".Sensor" android:label="@string/sensor" />
         <activity android:name=".Servo" android:label="@string/servo" />
         <activity android:name=".Speaker" android:label="@string/speaker" />
+        <activity android:name=".pin" android:label="@string/pin" />
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 

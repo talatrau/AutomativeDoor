@@ -18,9 +18,9 @@ import java.nio.charset.Charset;
 public class MQTTServer {
     final String serverUri ="tcp://io.adafruit.com:1883";
     final String clientId ="[YourclientID]";
-    final String subscriptionTopic ="CongTuVu/feeds/bbc-led";
+    final String subscriptionTopic ="CongTuVu/groups/automativedoor\n";
     final String username ="CongTuVu";
-    final String password ="aio_aYJy66QEa0BevTi87VEpKBrbM0Fk";
+    final String password ="[REPLACE WITH KEY]";    // KEY: aio_GBRW76yEm6lWtFuZ4eFbf2QV6QoM
 
     public MqttAndroidClient mqttAndroidClient;
 
