@@ -18,6 +18,11 @@ public class SensorHis extends History {
     public SensorHis() {
         super("1", "no");
     }
+    public SensorHis(String sTime, String eTime) {
+        super("1", "no");
+        this.sTime = sTime;
+        this.eTime = eTime;
+    }
 
 
 

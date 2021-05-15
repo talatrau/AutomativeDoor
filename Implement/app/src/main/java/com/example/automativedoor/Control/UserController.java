@@ -112,6 +112,7 @@ public class UserController {
     public void loadHistory(int typ, int amount) {
         // typ = 0: sensor 1: speaker 2: servo
         // amount of doccument
+        Log.wtf("Load_data", "loadHistory ran");
         driver.getHistory(typ, amount);
     }
 
@@ -235,6 +236,7 @@ public class UserController {
                             sensorList.get(index).setCurrentHis(Integer.parseInt(post.getKey()) + 1);
                             sensorList.get(index).setSensorHis(post.getValue(SensorHis.class));
                         }
+                        Log.wtf("Load data", "done");
                     }
 
                     @Override
@@ -281,6 +283,7 @@ public class UserController {
 
         public void getHistory(int typ, int amount) {
             if (typ == 0) {
+                Log.wtf("Load_data", "type = 0");
                 for (Sensor sensor : sensorList) {
                     database.getReference("SensorHis").child(hash).child(sensor.getDeviceID()).limitToLast(amount).addValueEventListener(new ValueEventListener(){
                         @Override
@@ -289,6 +292,7 @@ public class UserController {
                             for (DataSnapshot post : snapshot.getChildren()) {
                                 sensorHisList.add(post.getValue(SensorHis.class));
                             }
+                            Log.wtf("Load_data", "size: " + sensorHisList.size());
                         }
 
                         @Override

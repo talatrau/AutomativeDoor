@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.automativedoor.Control.UserController;
+
 import org.naishadhparmar.zcustomcalendar.CustomCalendar;
 import org.naishadhparmar.zcustomcalendar.OnDateSelectedListener;
 import org.naishadhparmar.zcustomcalendar.Property;
@@ -29,11 +31,14 @@ public class GeneralHistory extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.working_history_activity);
 
+        UserController.getInstance().loadHistory(0, 4);
+
         calendar = (CalendarView) findViewById(R.id.calendarHistory);
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+
                 LocalDate date = LocalDate.of(year, month+1, dayOfMonth);
                 Toast.makeText(GeneralHistory.this, date.toString(), Toast.LENGTH_LONG).show();
                 startActivity(new Intent(GeneralHistory.this, HistoryDetail.class));
