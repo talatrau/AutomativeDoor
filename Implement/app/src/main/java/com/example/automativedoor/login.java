@@ -94,6 +94,10 @@ public class login extends AppCompatActivity {
                             }
                         } else {
                             Toast.makeText(login.this, "Error Email or Password! ", Toast.LENGTH_SHORT).show();
+                            //???
+//                            Toast.makeText(login.this, "Welcome back! " + email, Toast.LENGTH_SHORT).show();
+//                            startActivity(new Intent(getApplicationContext(), HomePage.class));
+//                            finish();
                         }
                     }
                 });
