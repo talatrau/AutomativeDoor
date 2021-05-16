@@ -31,16 +31,17 @@ public class GeneralHistory extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.working_history_activity);
 
-        UserController.getInstance().loadHistory(0, 4);
+        UserController.getInstance().loadHistory(UserController.getInstance().hisMode, 100);
 
         calendar = (CalendarView) findViewById(R.id.calendarHistory);
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-
+                Log.wtf("GeneralHitory", "onSelectedChange");
                 LocalDate date = LocalDate.of(year, month+1, dayOfMonth);
                 Toast.makeText(GeneralHistory.this, date.toString(), Toast.LENGTH_LONG).show();
+                Log.wtf("GeneralHistory", "start new intent");
                 startActivity(new Intent(GeneralHistory.this, HistoryDetail.class));
             }
         });

@@ -58,7 +58,13 @@ public class HistAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return listSensorHis.size();
+        int ret;
+        if (type == 0)
+            ret =  listSensorHis.size();
+        else if (type == 1)
+            ret = listSpeakerHis.size();
+        else ret = listServoHis.size();
+        return ret;
     }
 
     @Override
@@ -102,6 +108,7 @@ public class HistAdapter extends BaseAdapter {
         return ret;
     }
     private List<String> getData(ServoHis history){
+        Log.wtf("getData", "ran");
         List<String> ret = new ArrayList<>();
         ret.add(history.getStartTime());
         if (history.getEndTime() != "")
