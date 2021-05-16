@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.automativedoor.Control.MQTTServer;
 import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.EntityClass.Sensor;
 import com.example.automativedoor.R;
@@ -23,10 +24,13 @@ public class SensorAdapter extends BaseAdapter {
     private int layout;
     private List<Sensor> sensors;
 
-    public SensorAdapter(Context context, int layout, List<Sensor> sensors) {
+    MQTTServer mqttServer;
+
+    public SensorAdapter(Context context, int layout, List<Sensor> sensors, MQTTServer mqttServer) {
         this.context = context;
         this.layout = layout;
         this.sensors = sensors;
+        this.mqttServer = mqttServer;
     }
 
     @Override
@@ -69,8 +73,8 @@ public class SensorAdapter extends BaseAdapter {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-                if (holder.aSwitch.isChecked()) { UserController.getInstance().turnOnSensor(position); }
-                else UserController.getInstance().turnOffSensor(position);
+                if (holder.aSwitch.isChecked()) { UserController.getInstance().turnOnSensor(position, mqttServer); }
+                else UserController.getInstance().turnOffSensor(position, mqttServer);
             }
         });
 

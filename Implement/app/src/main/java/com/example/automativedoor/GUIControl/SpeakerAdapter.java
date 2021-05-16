@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.automativedoor.Control.MQTTServer;
 import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.EntityClass.Speaker;
 import com.example.automativedoor.R;
@@ -22,10 +23,13 @@ public class SpeakerAdapter extends BaseAdapter {
     private int layout;
     private List<Speaker> speakers;
 
-    public SpeakerAdapter(Context context, int layout, List<Speaker> speakers) {
+    MQTTServer mqttServer;
+
+    public SpeakerAdapter(Context context, int layout, List<Speaker> speakers, MQTTServer mqttServer) {
         this.context = context;
         this.layout = layout;
         this.speakers = speakers;
+        this.mqttServer = mqttServer;
     }
 
     @Override
@@ -79,7 +83,7 @@ public class SpeakerAdapter extends BaseAdapter {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                UserController.getInstance().setSpeaker(position, progressChangedValue);
+                UserController.getInstance().setSpeaker(position, progressChangedValue, mqttServer);
             }
         });
 

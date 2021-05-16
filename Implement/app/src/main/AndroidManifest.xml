@@ -43,6 +43,8 @@
         <activity android:name=".Servo" android:label="@string/servo" />
         <activity android:name=".Speaker" android:label="@string/speaker" />
 
+        <activity android:name=".pin" android:label="@string/pin" />
+<!--        <activity android:name=".pin" android:label="Pin" />-->
 <!--        <service android:name="org.eclipse.paho.android.service.MqttService" />-->
 
     </application>

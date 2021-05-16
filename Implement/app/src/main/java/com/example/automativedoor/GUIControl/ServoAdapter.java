@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.automativedoor.Control.MQTTServer;
 import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.EntityClass.Servo;
 import com.example.automativedoor.R;
@@ -26,10 +27,13 @@ public class ServoAdapter extends BaseAdapter {
     private int layout;
     private List<Servo> servos;
 
-    public ServoAdapter(Context context, int layout, List<Servo> servos) {
+    MQTTServer mqttServer;
+
+    public ServoAdapter(Context context, int layout, List<Servo> servos, MQTTServer mqttServer) {
         this.context = context;
         this.layout = layout;
         this.servos = servos;
+        this.mqttServer = mqttServer;
     }
 
     @Override
@@ -75,7 +79,7 @@ public class ServoAdapter extends BaseAdapter {
             public void onClick(View v) {
                 holder.open.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bounce));
                 Toast notify;
-                if (UserController.getInstance().openDoor(position)) {
+                if (UserController.getInstance().openDoor(position, mqttServer)) {
                     notify = Toast.makeText(context.getApplicationContext(), "Door opened", Toast.LENGTH_SHORT);
                 } else {
                     notify = Toast.makeText(context.getApplicationContext(), "This door is already opened", Toast.LENGTH_SHORT);
@@ -93,7 +97,7 @@ public class ServoAdapter extends BaseAdapter {
             public void onClick(View v) {
                 holder.close.startAnimation(AnimationUtils.loadAnimation(context, R.anim.bounce));
                 Toast notify;
-                if (UserController.getInstance().closeDoor(position)) {
+                if (UserController.getInstance().closeDoor(position, mqttServer)) {
                     notify = Toast.makeText(context.getApplicationContext(), "Door closed", Toast.LENGTH_SHORT);
                 } else {
                     notify = Toast.makeText(context.getApplicationContext(), "This door is already closed", Toast.LENGTH_SHORT);

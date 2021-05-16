@@ -13,12 +13,14 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.nio.charset.Charset;
+
 public class MQTTServer {
     final String serverUri ="tcp://io.adafruit.com:1883";
     final String clientId ="[YourclientID]";
-    final String subscriptionTopic ="[Yoursubscriptiontopic]";
-    final String username ="[Yourusername]";
-    final String password ="[Yourpassword]";
+    final String subscriptionTopic ="CongTuVu/groups/automativedoor\n";
+    final String username ="CongTuVu";
+    final String password ="[REPLACE WITH KEY]";    // KEY: aio_GBRW76yEm6lWtFuZ4eFbf2QV6QoM
 
     public MqttAndroidClient mqttAndroidClient;
 
@@ -58,7 +60,6 @@ public class MQTTServer {
         mqttConnectOptions.setCleanSession(false);
         mqttConnectOptions.setUserName(this.username);
         mqttConnectOptions.setPassword(this.password.toCharArray());
-
         try {
             this.mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
                 @Override
@@ -98,8 +99,9 @@ public class MQTTServer {
             });
 
         } catch (MqttException e) {
-            System.err.println("Exceptionstsubscribing");
+            Log.e("Exceptionstsubscribing", e.toString());
             e.printStackTrace();
         }
     }
+
 }
