@@ -1,10 +1,13 @@
 package com.example.automativedoor.EntityClass;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.automativedoor.Control.SensorService;
 import com.example.automativedoor.Control.UserController;
 import com.google.firebase.database.DatabaseReference;
 
@@ -26,6 +29,7 @@ public class Sensor extends Component {
         } else {
             this.state = signal;
             this.genHistory();
+            UserController.getInstance().trackingSensor(signal);
             return true;
         }
     }

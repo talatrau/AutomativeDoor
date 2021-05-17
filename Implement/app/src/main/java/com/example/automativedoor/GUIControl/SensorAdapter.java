@@ -24,13 +24,10 @@ public class SensorAdapter extends BaseAdapter {
     private int layout;
     private List<Sensor> sensors;
 
-    MQTTServer mqttServer;
-
-    public SensorAdapter(Context context, int layout, List<Sensor> sensors, MQTTServer mqttServer) {
+    public SensorAdapter(Context context, int layout, List<Sensor> sensors) {
         this.context = context;
         this.layout = layout;
         this.sensors = sensors;
-        this.mqttServer = mqttServer;
     }
 
     @Override
@@ -73,8 +70,8 @@ public class SensorAdapter extends BaseAdapter {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-                if (holder.aSwitch.isChecked()) { UserController.getInstance().turnOnSensor(position, mqttServer); }
-                else UserController.getInstance().turnOffSensor(position, mqttServer);
+                if (holder.aSwitch.isChecked()) { UserController.getInstance().turnOnSensor(position); }
+                else UserController.getInstance().turnOffSensor(position);
             }
         });
 

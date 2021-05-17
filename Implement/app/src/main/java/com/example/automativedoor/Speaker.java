@@ -25,8 +25,6 @@ public class Speaker extends AppCompatActivity {
 
     private UserController controller = UserController.getInstance();
 
-    MQTTServer mqttServer;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,9 +32,8 @@ public class Speaker extends AppCompatActivity {
         Log.e("Speaker in state: ", "onCreate");
 
         this.associate();
-        this.setMqtt();
 
-        adapter = new SpeakerAdapter(this, R.layout.stream_speaker, speakers, this.mqttServer);
+        adapter = new SpeakerAdapter(this, R.layout.stream_speaker, speakers);
         listView.setAdapter(adapter);
     }
 
@@ -45,30 +42,6 @@ public class Speaker extends AppCompatActivity {
         speakers = controller.speakerList;
     }
 
-    private void setMqtt() {
-        this.mqttServer = new MQTTServer(this);
-        mqttServer.setCallback(new MqttCallbackExtended() {
-            @Override
-            public void connectComplete(boolean reconnect, String serverURI) {
-
-            }
-
-            @Override
-            public void connectionLost(Throwable cause) {
-
-            }
-
-            @Override
-            public void messageArrived(String topic, MqttMessage message) throws Exception {
-
-            }
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken token) {
-
-            }
-        });
-    }
 
     @Override
     protected void onResume() {

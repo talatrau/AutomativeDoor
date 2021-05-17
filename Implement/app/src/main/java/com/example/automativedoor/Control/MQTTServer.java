@@ -18,14 +18,14 @@ import java.nio.charset.Charset;
 public class MQTTServer {
     final String serverUri ="tcp://io.adafruit.com:1883";
     final String clientId ="[YourclientID]";
-    final String subscriptionTopic ="CongTuVu/groups/automativedoor\n";
     final String username ="CongTuVu";
-    final String password ="[REPLACE WITH KEY]";    // KEY: aio_GBRW76yEm6lWtFuZ4eFbf2QV6QoM
+    final String password ="aio_NcTs7388b59DfdxRZutaWq1I2UGn";
 
     public MqttAndroidClient mqttAndroidClient;
 
     public MQTTServer(Context context) {
         this.mqttAndroidClient = new MqttAndroidClient(context, this.serverUri, this.clientId);
+        connect();
         this.mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
@@ -39,7 +39,7 @@ public class MQTTServer {
 
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
-                Log.w("Mqtt", message.toString());
+
             }
 
             @Override
@@ -47,7 +47,6 @@ public class MQTTServer {
 
             }
         });
-        connect();
     }
 
     public void setCallback(MqttCallbackExtended callback) {
@@ -70,7 +69,6 @@ public class MQTTServer {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
-                    subscribeToTopic();
                 }
 
                 @Override
@@ -84,7 +82,7 @@ public class MQTTServer {
         }
     }
 
-    private void subscribeToTopic() {
+    public void subscribeToTopic(String subscriptionTopic) {
         try {
             mqttAndroidClient.subscribe(subscriptionTopic, 0, null, new IMqttActionListener() {
                 @Override

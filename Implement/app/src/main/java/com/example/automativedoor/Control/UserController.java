@@ -1,11 +1,14 @@
 package com.example.automativedoor.Control;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import com.example.automativedoor.EntityClass.Account;
@@ -27,7 +30,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONObject;
 
 import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -43,16 +48,23 @@ public class UserController {
     static private UserController instance;
     private DatabaseDriver driver;
     private String hash;
+    private MQTTServer mqttServer;
+
     public List<SensorHis> sensorHisList;
     public List<ServoHis> servoHisList;
     public List<SpeakerHis> speakerHisList;
 
     final public FirebaseAuth fauth = FirebaseAuth.getInstance();
 
+    public Context context;
     public Account user;
     public ArrayList<Sensor> sensorList;
     public ArrayList<Speaker> speakerList;
     public ArrayList<Servo> servoList;
+
+    private UserController() {
+        driver = new DatabaseDriver();
+    }
 
     public static UserController getInstance() {
         if (instance == null) {
@@ -62,47 +74,73 @@ public class UserController {
         return instance;
     }
 
-    private UserController() {
-        driver = new DatabaseDriver();
+    public void setMqttSubcribe(String feedKey) {
+        this.mqttServer.subscribeToTopic(feedKey);
+    }
+
+    public void closeMqttSubcribe(String feedkey) {
+        try {
+            this.mqttServer.mqttAndroidClient.unsubscribe(feedkey);
+        } catch (MqttException e) {
+            Log.e("unsubscribe", "topic not exists");
+        }
+    }
+
+    public void setMqttServer() {
+        if (this.mqttServer == null) {
+            this.mqttServer = new MQTTServer(context);
+        }
     }
 
     public String getHash() {
         return this.hash;
     }
 
-    public void setSpeaker(int position, int volume, MQTTServer mqttServer) {
+    public void setSpeaker(int position, int volume) {
         Speaker speaker = this.speakerList.get(position);
         speaker.changeVolume(volume);
-        this.sendDataMQTT(String.valueOf(volume), "CongTuVu/feeds/automativedoor.buzzer\n", mqttServer);
+        this.sendDataMQTT(String.valueOf(volume), "CongTuVu/feeds/automativedoor.buzzer\n");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void turnOnSensor(int position, MQTTServer mqttServer) {
+    public void turnOnSensor(int position) {
         if (this.sensorList.get(position).toggle(true)) {
-            this.sendDataMQTT("ON", "CongTuVu/feeds/automativedoor.sensor\n", mqttServer);
+            //this.sendDataMQTT("ON", "CongTuVu/feeds/automativedoor.sensor\n");
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void turnOffSensor(int position, MQTTServer mqttServer) {
+    public void turnOffSensor(int position) {
         if (this.sensorList.get(position).toggle(false)) {
-            this.sendDataMQTT("OFF", "CongTuVu/feeds/automativedoor.sensor\n", mqttServer);
+            //this.sendDataMQTT("OFF", "CongTuVu/feeds/automativedoor.sensor\n");
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public boolean openDoor(int position, MQTTServer mqttServer) {
+    public boolean openDoor(int position) {
+        Log.e("open the door", "message");
         if (this.servoList.get(position).toggle(true)) {
-            this.sendDataMQTT("ON", "CongTuVu/feeds/automativedoor.servo\n", mqttServer);
+            this.sendDataMQTT("{\n" +
+                    "\"id\":\"17\",\n" +
+                    "\"name\":\"SERVO\",\n" +
+                    "\"data\":\"180\",\n" +
+                    "\"unit\":\"degree\"\n" +
+                    "}\n", "CongTuVu/feeds/automativedoor.servo\n");
             return true;
         }
         return false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public boolean closeDoor(int position, MQTTServer mqttServer) {
+    public boolean closeDoor(int position) {
+        Log.e("close the door", "message");
         if (this.servoList.get(position).toggle(false)) {
-            this.sendDataMQTT("OFF", "CongTuVu/feeds/automativedoor.servo\n", mqttServer);
+            this.sendDataMQTT("{\n" +
+                    "\"id\":\"17\",\n" +
+                    "\"name\":\"SERVO\",\n" +
+                    "\"data\":\"0\",\n" +
+                    "\"unit\":\"degree\"\n" +
+                    "}\n", "CongTuVu/feeds/automativedoor.servo\n");
             return true;
         }
         return false;
@@ -110,8 +148,54 @@ public class UserController {
 
     // must start a new thread in this method
     // to always tracking sensor and alarm
-    public void trackingSensor() {
+    public void trackingSensor(boolean signal) {
+        if (signal) {
+            CountDownTimer counter = new CountDownTimer(5000, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) { }
 
+                @Override
+                public void onFinish() {
+                    Log.e("counter", "finished");
+                    closeDoor(0);
+                }
+            };
+            context.startService(new Intent(context, SensorService.class));
+            this.setMqttSubcribe("CongTuVu/feeds/automativedoor.sensor");
+            mqttServer.setCallback(new MqttCallbackExtended() {
+                @Override
+                public void connectComplete(boolean reconnect, String serverURI) {
+
+                }
+
+                @Override
+                public void connectionLost(Throwable cause) {
+
+                }
+
+                @Override
+                public void messageArrived(String topic, MqttMessage message) throws Exception {
+                    JSONObject jsonObject = new JSONObject(message.toString());
+                    String data = jsonObject.getString("data");
+                    if (!data.equals("00")) {
+                        counter.cancel();
+                        openDoor(0);
+                    } else {
+                        counter.start();
+                    }
+                    Log.w("message arrived", jsonObject.getString("data"));
+                }
+
+                @Override
+                public void deliveryComplete(IMqttDeliveryToken token) {
+
+                }
+            });
+
+        } else {
+            context.stopService(new Intent(context, SensorService.class));
+            UserController.getInstance().closeMqttSubcribe("CongTuVu/feeds/automativedoor.sensor");
+        }
     }
 
     public void sendResponse(int score, String text) {
@@ -147,7 +231,7 @@ public class UserController {
         }
     }
 
-    private void sendDataMQTT(String data, String feedPath, MQTTServer mqttServer) {
+    private void sendDataMQTT(String data, String feedPath) {
         MqttMessage msg = new MqttMessage();
         msg.setId(1234);
         msg.setQos(0);
@@ -157,8 +241,8 @@ public class UserController {
         msg.setPayload(b);
 
         try {
-            mqttServer.mqttAndroidClient.publish(feedPath, msg);
-            Log.e("taatrau", "ok");
+            this.mqttServer.mqttAndroidClient.publish(feedPath, msg);
+            this.closeMqttSubcribe("CongTuVu/feeds/automativedoor.servo\n");
         } catch (Exception e) {
             Log.e("Exception", e.toString());
         }

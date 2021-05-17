@@ -14,13 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.automativedoor.Control.UserController;
 
-import org.naishadhparmar.zcustomcalendar.CustomCalendar;
-import org.naishadhparmar.zcustomcalendar.OnDateSelectedListener;
-import org.naishadhparmar.zcustomcalendar.Property;
-
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.HashMap;
+
 
 public class GeneralHistory extends AppCompatActivity {
     CalendarView calendar;

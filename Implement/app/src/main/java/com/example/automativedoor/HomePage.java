@@ -42,6 +42,8 @@ public class HomePage extends AppCompatActivity {
         Log.e("Homepage in state: ", "onCreate");
 
         this.setUpButtonEvent();
+        UserController.getInstance().context = this;
+        UserController.getInstance().setMqttServer();
     }
 
     private void setUpButtonEvent() {

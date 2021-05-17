@@ -23,13 +23,11 @@ public class SpeakerAdapter extends BaseAdapter {
     private int layout;
     private List<Speaker> speakers;
 
-    MQTTServer mqttServer;
 
-    public SpeakerAdapter(Context context, int layout, List<Speaker> speakers, MQTTServer mqttServer) {
+    public SpeakerAdapter(Context context, int layout, List<Speaker> speakers) {
         this.context = context;
         this.layout = layout;
         this.speakers = speakers;
-        this.mqttServer = mqttServer;
     }
 
     @Override
@@ -83,7 +81,7 @@ public class SpeakerAdapter extends BaseAdapter {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                UserController.getInstance().setSpeaker(position, progressChangedValue, mqttServer);
+                UserController.getInstance().setSpeaker(position, progressChangedValue);
             }
         });
 

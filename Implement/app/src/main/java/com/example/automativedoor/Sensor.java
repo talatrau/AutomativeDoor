@@ -26,8 +26,6 @@ public class Sensor extends AppCompatActivity {
 
     private UserController controller = UserController.getInstance();
 
-    MQTTServer mqttServer;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +34,8 @@ public class Sensor extends AppCompatActivity {
         Log.e("Sensor in state: ", "onCreate");
 
         this.associate();
-        this.setMqtt();
 
-        adapter = new SensorAdapter(this, R.layout.stream_sensor, sensors, mqttServer);
+        adapter = new SensorAdapter(this, R.layout.stream_sensor, sensors);
         listView.setAdapter(adapter);
 
     }
@@ -46,31 +43,6 @@ public class Sensor extends AppCompatActivity {
     private void associate() {
         listView = (ListView) findViewById(R.id.sensor_listview);
         sensors = controller.sensorList;
-    }
-
-    private void setMqtt() {
-        this.mqttServer = new MQTTServer(this);
-        mqttServer.setCallback(new MqttCallbackExtended() {
-            @Override
-            public void connectComplete(boolean reconnect, String serverURI) {
-
-            }
-
-            @Override
-            public void connectionLost(Throwable cause) {
-
-            }
-
-            @Override
-            public void messageArrived(String topic, MqttMessage message) throws Exception {
-
-            }
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken token) {
-
-            }
-        });
     }
 
     @Override
