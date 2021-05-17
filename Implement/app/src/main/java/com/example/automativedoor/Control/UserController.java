@@ -53,7 +53,6 @@ public class UserController {
     public List<SensorHis> sensorHisList;
     public List<ServoHis> servoHisList;
     public List<SpeakerHis> speakerHisList;
-    public int hisMode; // 0: sensor 1: speaker 2: servo
 
     final public FirebaseAuth fauth = FirebaseAuth.getInstance();
 

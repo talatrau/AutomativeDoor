@@ -14,28 +14,19 @@ import java.util.List;
 
 
 public class HistoryDetail extends AppCompatActivity {
+//    Array histories;
+    List<SensorHis> histories;
     ListView listView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.history_detail_activity);
+        UserController.getInstance().loadHistory(0, 4);
 
-        Log.wtf("HistoryDetail", "ran");
-
+        histories = UserController.getInstance().sensorHisList;
         HistAdapter histAdapter = new HistAdapter(HistoryDetail.this, R.layout.stream_tworound_history);
-        if (UserController.getInstance().hisMode == 0) {
-            Log.wtf("HistotyDetail", "sensor histories");
-            histAdapter.setListSensorHis(UserController.getInstance().sensorHisList);
-        }
-        else if (UserController.getInstance().hisMode == 1) {
-            Log.wtf("HistotyDetail", "speaker histories");
-            histAdapter.setListSpeakerHis(UserController.getInstance().speakerHisList);
-        }
-        else if (UserController.getInstance().hisMode == 2) {
-            Log.wtf("HistotyDetail", "servo histories");
-            histAdapter.setListServoHis(UserController.getInstance().servoHisList);
-        }
+        histAdapter.setListSensorHis(histories);
 
         listView = findViewById(R.id.listHistory);
         listView.setAdapter(histAdapter);

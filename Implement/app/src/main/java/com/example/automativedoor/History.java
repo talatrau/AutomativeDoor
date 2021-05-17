@@ -24,21 +24,6 @@ public class History extends AppCompatActivity {
         servoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                UserController.getInstance().hisMode = 2;
-                startActivity(new Intent(History.this, GeneralHistory.class));
-            }
-        });
-        sensorBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UserController.getInstance().hisMode = 0;
-                startActivity(new Intent(History.this, GeneralHistory.class));
-            }
-        });
-        buzzerBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UserController.getInstance().hisMode = 0;
                 startActivity(new Intent(History.this, GeneralHistory.class));
             }
         });
