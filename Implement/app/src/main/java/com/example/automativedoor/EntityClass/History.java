@@ -10,13 +10,5 @@ public class History {
         this.deviceID = deviceID;
         this.name = name;
     }
-    public String getStartTime(){
-        Log.wtf("History", "getStart");
-        return "history";
-    }
-    public String getEndTime(){
-        Log.wtf("History", "getEndTime");
-        return "history";
-    }
 
 }

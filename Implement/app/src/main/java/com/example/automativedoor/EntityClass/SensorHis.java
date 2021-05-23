@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SensorHis extends History {
-    public String sTime;
-    public String eTime;
+    public String sTime = "";
+    public String eTime = "";
     public List<String> obstacle;
 
     public SensorHis() {
@@ -60,13 +60,4 @@ public class SensorHis extends History {
         return distance;        // return distance between start and end time
     }
 
-    @Override
-    public String getStartTime() {
-        return sTime;
-    }
-
-    @Override
-    public String getEndTime() {
-        return eTime;
-    }
 }

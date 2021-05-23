@@ -17,9 +17,9 @@ import java.nio.charset.Charset;
 
 public class MQTTServer {
     final String serverUri ="tcp://io.adafruit.com:1883";
-    final String clientId ="[YourclientID]";
+    final String clientId ="abcxyz";
     final String username ="CongTuVu";
-    final String password ="aio_NcTs7388b59DfdxRZutaWq1I2UGn";
+    final String password ="aio_AwHu03uY2aZmyeg92ojd3vB2zXn4";
 
     public MqttAndroidClient mqttAndroidClient;
 
@@ -34,7 +34,7 @@ public class MQTTServer {
 
             @Override
             public void connectionLost(Throwable cause) {
-
+                Log.w("mqtt", "lost connection");
             }
 
             @Override
@@ -99,6 +99,23 @@ public class MQTTServer {
         } catch (MqttException e) {
             Log.e("Exceptionstsubscribing", e.toString());
             e.printStackTrace();
+        }
+    }
+
+    public void publishMqtt(String message, String feedPath) {
+        MqttMessage msg = new MqttMessage();
+        msg.setId(1234);
+        msg.setQos(0);
+        msg.setRetained(true);
+
+        byte[] b = message.getBytes(Charset.forName("UTF-8"));
+        msg.setPayload(b);
+
+        try {
+            this.mqttAndroidClient.publish(feedPath, msg);
+            this.mqttAndroidClient.unsubscribe(feedPath);
+        } catch (Exception e) {
+            Log.e("Exception", e.toString());
         }
     }
 

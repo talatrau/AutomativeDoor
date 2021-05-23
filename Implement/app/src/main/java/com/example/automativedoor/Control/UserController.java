@@ -99,7 +99,6 @@ public class UserController {
     public void setSpeaker(int position, int volume) {
         Speaker speaker = this.speakerList.get(position);
         speaker.changeVolume(volume);
-        this.sendDataMQTT(String.valueOf(volume), "CongTuVu/feeds/automativedoor.buzzer\n");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -120,7 +119,7 @@ public class UserController {
     public boolean openDoor(int position) {
         Log.e("open the door", "message");
         if (this.servoList.get(position).toggle(true)) {
-            this.sendDataMQTT("{\n" +
+            this.mqttServer.publishMqtt("{\n" +
                     "\"id\":\"17\",\n" +
                     "\"name\":\"SERVO\",\n" +
                     "\"data\":\"180\",\n" +
@@ -135,7 +134,7 @@ public class UserController {
     public boolean closeDoor(int position) {
         Log.e("close the door", "message");
         if (this.servoList.get(position).toggle(false)) {
-            this.sendDataMQTT("{\n" +
+            this.mqttServer.publishMqtt("{\n" +
                     "\"id\":\"17\",\n" +
                     "\"name\":\"SERVO\",\n" +
                     "\"data\":\"0\",\n" +
@@ -228,23 +227,6 @@ public class UserController {
             driver.readComponent();
             driver.readUser();
             return true;
-        }
-    }
-
-    private void sendDataMQTT(String data, String feedPath) {
-        MqttMessage msg = new MqttMessage();
-        msg.setId(1234);
-        msg.setQos(0);
-        msg.setRetained(true);
-
-        byte[] b = data.getBytes(Charset.forName("UTF-8"));
-        msg.setPayload(b);
-
-        try {
-            this.mqttServer.mqttAndroidClient.publish(feedPath, msg);
-            this.closeMqttSubcribe("CongTuVu/feeds/automativedoor.servo\n");
-        } catch (Exception e) {
-            Log.e("Exception", e.toString());
         }
     }
 

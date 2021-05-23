@@ -96,16 +96,16 @@ public class HistAdapter extends BaseAdapter {
     }
     private List<String> getData(SensorHis history){
         List<String> ret = new ArrayList<>();
-        ret.add(history.getStartTime());
-        if (history.getEndTime() != "")
-            ret.add(history.getEndTime());
+        ret.add(history.sTime);
+        if (history.eTime != "")
+            ret.add(history.eTime);
         return ret;
     }
     private List<String> getData(ServoHis history){
         List<String> ret = new ArrayList<>();
-        ret.add(history.getStartTime());
-        if (history.getEndTime() != "")
-            ret.add(history.getEndTime());
+        ret.add(history.oTime);
+        if (history.cTime != "")
+            ret.add(history.cTime);
         return ret;
     }
 

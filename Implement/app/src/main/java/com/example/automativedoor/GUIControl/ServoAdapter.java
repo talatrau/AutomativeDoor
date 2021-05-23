@@ -89,7 +89,6 @@ public class ServoAdapter extends BaseAdapter {
                     public void onFinish() {notify.cancel();}
                 }.start();
 
-                context.startService(new Intent(context, SensorService.class));
             }
         });
 
