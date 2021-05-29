@@ -1,9 +1,12 @@
 package com.example.automativedoor;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -11,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.automativedoor.Control.MQTTServer;
 import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.EntityClass.Sensor;
 import com.example.automativedoor.EntityClass.Servo;
@@ -19,6 +21,7 @@ import com.example.automativedoor.EntityClass.Speaker;
 import com.example.automativedoor.GUIControl.ComponentAdapter;
 
 import java.util.ArrayList;
+
 
 public class Component extends AppCompatActivity {
     private ListView listView;
@@ -29,12 +32,19 @@ public class Component extends AppCompatActivity {
 
     private UserController controller = UserController.getInstance();
 
+    private ImageView sensor_btn;
+    private ImageView servo_btn;
+    private ImageView speaker_btn;
+    private TextView sensor_txt;
+    private TextView servo_txt;
+    private TextView speaker_txt;
+    private SwipeRefreshLayout swipe;
 
-    private void sensorClick() { startActivity(new Intent(this, com.example.automativedoor.Sensor.class)); }
+    private void sensorClick() { startActivityForResult(new Intent(this, pin.class), 1); }
 
-    private void speakerClick() { startActivity(new Intent(this, com.example.automativedoor.Speaker.class)); }
+    private void speakerClick() { startActivityForResult(new Intent(this, pin.class), 2); }
 
-    private void servoClick() { startActivity(new Intent(this, com.example.automativedoor.Servo.class)); }
+    private void servoClick() { startActivityForResult(new Intent(this, pin.class), 3); }
 
 
     @Override
@@ -52,8 +62,8 @@ public class Component extends AppCompatActivity {
     }
 
     private void setUpButtonEvent() {
-        ImageView sensor_btn = (ImageView) findViewById(R.id.component_sensor_btn);
-        TextView sensor_txt = (TextView) findViewById(R.id.component_sensor_text);
+        this.sensor_btn = (ImageView) findViewById(R.id.component_sensor_btn);
+        this.sensor_txt = (TextView) findViewById(R.id.component_sensor_text);
 
         sensor_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,8 +83,8 @@ public class Component extends AppCompatActivity {
             }
         });
 
-        ImageView servo_btn = (ImageView) findViewById(R.id.component_servo_btn);
-        TextView servo_txt = (TextView) findViewById(R.id.component_servo_text);
+        this.servo_btn = (ImageView) findViewById(R.id.component_servo_btn);
+        this.servo_txt = (TextView) findViewById(R.id.component_servo_text);
 
         servo_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,8 +104,8 @@ public class Component extends AppCompatActivity {
             }
         });
 
-        ImageView speaker_btn = (ImageView) findViewById(R.id.component_speaker_btm);
-        TextView speaker_txt = (TextView) findViewById(R.id.component_speaker_text);
+        this.speaker_btn = (ImageView) findViewById(R.id.component_speaker_btm);
+        this.speaker_txt = (TextView) findViewById(R.id.component_speaker_text);
 
         speaker_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,6 +122,15 @@ public class Component extends AppCompatActivity {
                 speaker_btn.startAnimation(AnimationUtils.loadAnimation(Component.this, R.anim.bounce));
                 speaker_txt.startAnimation(AnimationUtils.loadAnimation(Component.this, R.anim.bounce));
                 speakerClick();
+            }
+        });
+
+        this.swipe = (SwipeRefreshLayout) findViewById(R.id.component_swipe);
+        this.swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshItem();
+                swipe.setRefreshing(false);
             }
         });
     }
@@ -131,6 +150,12 @@ public class Component extends AppCompatActivity {
             components.add(servo);
         }
 
+    }
+
+    private void refreshItem() {
+        this.associate();
+        adapter = new ComponentAdapter(this, R.layout.stream_component, components);
+        listView.setAdapter(adapter);
     }
 
     @Override
@@ -155,9 +180,7 @@ public class Component extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
 //        Log.e("Component in state: ", "onRestart");
-        this.associate();
-        adapter = new ComponentAdapter(this, R.layout.stream_component, components);
-        listView.setAdapter(adapter);
+        this.refreshItem();
     }
 
     @Override
@@ -178,5 +201,25 @@ public class Component extends AppCompatActivity {
 //        Log.e("Component in state: ", "onDestroy");
     }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == AppCompatActivity.RESULT_OK) {
+            final String result = data.getStringExtra(pin.PIN_RESULT);
+            if (result.equals("pin correct")) {
+                if (requestCode == 1) startActivity(new Intent(this, com.example.automativedoor.Sensor.class));
+                else if (requestCode == 2) startActivity(new Intent(this, com.example.automativedoor.Speaker.class));
+                else if (requestCode == 3) startActivity(new Intent(this, com.example.automativedoor.Servo.class));
+            }
+            else if (result.equals("disable")) {
+                String content = "Ai do dang co gang truy cap vao thiet bi cua ban!!! <br> Hay co chinh sach bao ve ma PIN cua ban. <br>";
+                content += "<h1>Smart Home App</h1>" +
+                        "<img src=\"https://img.docbao.vn/images/uploads/2019/11/11/xa-hoi/smart-home.jpg\" width=\"1000\" height=\"600\">";
+                controller.sendMail("Invalid Access", content);
+            }
+        }
+    }
 
 }

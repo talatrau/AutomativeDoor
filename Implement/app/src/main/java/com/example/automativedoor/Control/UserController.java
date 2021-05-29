@@ -1,12 +1,13 @@
 package com.example.automativedoor.Control;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
-import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.SystemClock;
+
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -20,6 +21,7 @@ import com.example.automativedoor.EntityClass.Servo;
 import com.example.automativedoor.EntityClass.ServoHis;
 import com.example.automativedoor.EntityClass.Speaker;
 import com.example.automativedoor.EntityClass.SpeakerHis;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,13 +37,20 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONObject;
 
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Properties;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 public class UserController {
 
@@ -49,6 +58,7 @@ public class UserController {
     private DatabaseDriver driver;
     private String hash;
     private MQTTServer mqttServer;
+    private int serviceCount = 0;
 
     public List<SensorHis> sensorHisList;
     public List<ServoHis> servoHisList;
@@ -74,21 +84,54 @@ public class UserController {
         return instance;
     }
 
-    public void setMqttSubcribe(String feedKey) {
-        this.mqttServer.subscribeToTopic(feedKey);
+    public int getSpeakerIndex(String deviceID) {
+        for (int i = 0; i < speakerList.size(); i++) {
+            if (speakerList.get(i).getDeviceID().equals(deviceID)) return i;
+        }
+        return -1;
     }
 
-    public void closeMqttSubcribe(String feedkey) {
+    public int getServoIndex(String deviceID) {
+        for (int i = 0; i < servoList.size(); i++) {
+            if (servoList.get(i).getDeviceID().equals(deviceID)) return i;
+        }
+        return -1;
+    }
+
+    public void setMqttSubcribe(String feedKey, boolean signal) {
+        if (signal) {
+            if (this.serviceCount == 0) {
+                context.startService(new Intent(context, SensorService.class));
+            }
+            this.serviceCount += 1;
+            this.mqttServer.subscribeToTopic(feedKey);
+        }
+        else {
+            if (this.serviceCount == 1) {
+                context.stopService(new Intent(context, SensorService.class));
+            }
+            this.serviceCount -= 1;
+            this.mqttServer.unsubscribeToTopic(feedKey);
+        }
+    }
+
+    public void closeMqttConnection() {
         try {
-            this.mqttServer.mqttAndroidClient.unsubscribe(feedkey);
+            if (serviceCount == 0) {
+                this.mqttServer.mqttAndroidClient.disconnect();
+                Log.e("mqtt connection", "disconnected");
+                this.mqttServer = null;
+            }
         } catch (MqttException e) {
-            Log.e("unsubscribe", "topic not exists");
+            Log.e("Error when close mqtt", e.toString());
         }
     }
 
     public void setMqttServer() {
         if (this.mqttServer == null) {
-            this.mqttServer = new MQTTServer(context);
+            Log.e("mqtt connection", "connected");
+            this.mqttServer = new MQTTServer(context, "mainMqttService");
+            this.trackingSensor();
         }
     }
 
@@ -99,6 +142,13 @@ public class UserController {
     public void setSpeaker(int position, int volume) {
         Speaker speaker = this.speakerList.get(position);
         speaker.changeVolume(volume);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void alarmSpeaker(boolean signal, int position) {
+        String mess = this.speakerList.get(position).alarm(signal);
+        String topic = this.speakerList.get(position).getMqttTopic();
+        this.mqttServer.publishMqtt(mess, topic);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -119,12 +169,13 @@ public class UserController {
     public boolean openDoor(int position) {
         Log.e("open the door", "message");
         if (this.servoList.get(position).toggle(true)) {
+            String topic = this.servoList.get(position).getMqttTopic();
             this.mqttServer.publishMqtt("{\n" +
                     "\"id\":\"17\",\n" +
                     "\"name\":\"SERVO\",\n" +
                     "\"data\":\"180\",\n" +
                     "\"unit\":\"degree\"\n" +
-                    "}\n", "CongTuVu/feeds/automativedoor.servo\n");
+                    "}\n", topic);
             return true;
         }
         return false;
@@ -134,67 +185,49 @@ public class UserController {
     public boolean closeDoor(int position) {
         Log.e("close the door", "message");
         if (this.servoList.get(position).toggle(false)) {
+            String topic = this.servoList.get(position).getMqttTopic();
             this.mqttServer.publishMqtt("{\n" +
                     "\"id\":\"17\",\n" +
                     "\"name\":\"SERVO\",\n" +
                     "\"data\":\"0\",\n" +
                     "\"unit\":\"degree\"\n" +
-                    "}\n", "CongTuVu/feeds/automativedoor.servo\n");
+                    "}\n", topic);
             return true;
         }
         return false;
     }
 
-    // must start a new thread in this method
-    // to always tracking sensor and alarm
-    public void trackingSensor(boolean signal) {
-        if (signal) {
-            CountDownTimer counter = new CountDownTimer(5000, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) { }
+    public void trackingSensor() {
+        mqttServer.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean reconnect, String serverURI) {
+                Log.w("mqtt", serverURI);
+            }
 
-                @Override
-                public void onFinish() {
-                    Log.e("counter", "finished");
-                    closeDoor(0);
+            @Override
+            public void connectionLost(Throwable cause) {
+
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                JSONObject jsonObject = new JSONObject(message.toString());
+                int index = 0;
+                for (int i = 0; i < sensorList.size(); i++) {
+                    if (sensorList.get(i).getMqttTopic().equals(topic)) index = i;
                 }
-            };
-            context.startService(new Intent(context, SensorService.class));
-            this.setMqttSubcribe("CongTuVu/feeds/automativedoor.sensor");
-            mqttServer.setCallback(new MqttCallbackExtended() {
-                @Override
-                public void connectComplete(boolean reconnect, String serverURI) {
+                String data = jsonObject.getString("data");
+                Log.w("message arrived", data);
+                sensorList.get(index).processConnect(data);
+            }
 
-                }
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
 
-                @Override
-                public void connectionLost(Throwable cause) {
+            }
+        });
 
-                }
-
-                @Override
-                public void messageArrived(String topic, MqttMessage message) throws Exception {
-                    JSONObject jsonObject = new JSONObject(message.toString());
-                    String data = jsonObject.getString("data");
-                    if (!data.equals("00")) {
-                        counter.cancel();
-                        openDoor(0);
-                    } else {
-                        counter.start();
-                    }
-                    Log.w("message arrived", jsonObject.getString("data"));
-                }
-
-                @Override
-                public void deliveryComplete(IMqttDeliveryToken token) {
-
-                }
-            });
-
-        } else {
-            context.stopService(new Intent(context, SensorService.class));
-            UserController.getInstance().closeMqttSubcribe("CongTuVu/feeds/automativedoor.sensor");
-        }
     }
 
     public void sendResponse(int score, String text) {
@@ -230,7 +263,53 @@ public class UserController {
         }
     }
 
-    private void sendMail() {
+    public void forgotPass(String email, String pin) {
+        this.hash = md5Hash(email);
+        driver.readUser().get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if (user != null && user.pinVerify(pin)) {
+                    String message = "Your password is <u>" + user.getPass() + "</u>. <br>" ;
+                    message += "<h1>Smart Home App</h1>" +
+                            "<img src=\"https://img.docbao.vn/images/uploads/2019/11/11/xa-hoi/smart-home.jpg\" width=\"1000\" height=\"600\">";
+                    sendMail("Forgot Pass", message);
+                    hash = null;
+                    user = null;
+                }
+            }
+        });
+
+    }
+
+    public void sendMail(String subject, String content) {
+        final String username = "smarthome.hcmut.k18@gmail.com";
+        final String password = "54066034a";
+        Properties properties = new Properties();
+
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.host", "smtp.gmail.com");
+        properties.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(username));
+            message.setRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
+            message.setContent(content, "text/html");
+            message.setSubject(subject);
+
+            new SendMail(message).execute();
+
+        } catch (MessagingException e) {
+            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();
+        }
 
     }
 
@@ -314,7 +393,7 @@ public class UserController {
 
         }
 
-        public void readUser() {
+        public DatabaseReference readUser() {
             ref = database.getReference("User").child(hash);
             ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -327,6 +406,7 @@ public class UserController {
                     Log.e("some thing wrong with ", error.toString());
                 }
             });
+            return ref;
         }
 
         public void getCurrentHis(int typ, String deviceID, int index) {
@@ -443,10 +523,35 @@ public class UserController {
         }
 
         public void saveResponse(Response response) {
-            DatabaseReference reference = database.getReference("Response").child(hash).push();
+            DatabaseReference reference = database.getReference("Response").child(hash);
             reference.setValue(response);
         }
 
+    }
+
+    class SendMail extends AsyncTask<Void, Void, String> {
+
+        private Message message;
+
+        public SendMail(Message message) {
+            this.message = message;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            try {
+                Transport.send(this.message);
+                return "Success";
+            } catch (MessagingException e) {
+                e.printStackTrace();
+                return "Error";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+        }
     }
 
 }

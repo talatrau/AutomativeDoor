@@ -23,21 +23,32 @@ public class Speaker extends Component {
     public void setVolume(int volume) { this.volume = volume; }
 
     public void changeVolume(int volume) {
-        // TODO: set real buzzer volume
-
         this.setVolume(volume);
         DatabaseReference reference = database.getReference("Component").child(UserController.getInstance().getHash()).child("Speaker");
         reference.child(this.currentIndex).setValue(this);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void alarm(int second) {
-        // TODO: alarm real buzzer
-
-
-
-        this.saveHistory();
-
+    public String alarm(boolean signal) {
+        if (signal) {
+            String message = "{\n" +
+                    "\"id\":\"3\",\n" +
+                    "\"name\":\"SPEAKER\",\n" +
+                    "\"data\":\"" + String.valueOf(this.volume * 10) + "\",\n" +
+                    "\"unit\":\"\"\n" +
+                    "}\n";
+            this.saveHistory();
+            return message;
+        }
+        else {
+            String message = "{\n" +
+                    "\"id\":\"3\",\n" +
+                    "\"name\":\"SPEAKER\",\n" +
+                    "\"data\":\"0\",\n" +
+                    "\"unit\":\"\"\n" +
+                    "}\n";
+            return message;
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

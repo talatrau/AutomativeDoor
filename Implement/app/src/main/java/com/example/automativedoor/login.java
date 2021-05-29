@@ -94,10 +94,6 @@ public class login extends AppCompatActivity {
                             }
                         } else {
                             Toast.makeText(login.this, "Error Email or Password! ", Toast.LENGTH_SHORT).show();
-                            //???
-//                            Toast.makeText(login.this, "Welcome back! " + email, Toast.LENGTH_SHORT).show();
-//                            startActivity(new Intent(getApplicationContext(), HomePage.class));
-//                            finish();
                         }
                     }
                 });
@@ -118,7 +114,7 @@ public class login extends AppCompatActivity {
     private void contactShow() {
         AlertDialog.Builder builder = new AlertDialog.Builder(login.this);
         builder.setTitle("Contact us via");
-        builder.setMessage("\n Phone: \t 113-114-115 \n \n Eamil: \t abcxyz@yahoo.com");
+        builder.setMessage("\n Phone: \t 113-114-115 \n \n Email: \n \n \t smarthome.hcmut.k18@gmail.com");
 
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override

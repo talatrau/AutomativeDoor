@@ -13,7 +13,7 @@ import java.util.List;
 public class SensorHis extends History {
     public String sTime = "";
     public String eTime = "";
-    public List<String> obstacle;
+    public List<String> obstacle = null;
 
     public SensorHis() {
         super("1", "no");

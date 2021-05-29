@@ -150,6 +150,7 @@ public class HomePage extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        UserController.getInstance().closeMqttConnection();
         Log.e("Homepage in state: ", "onDestroy");
     }
 

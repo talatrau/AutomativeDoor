@@ -11,6 +11,15 @@ public abstract class Component {
     protected int currentHis;
     protected String currentIndex;
     protected FirebaseDatabase database;
+    protected String mqttTopic;
+
+    public void setMqttTopic(String mqttTopic) {
+        this.mqttTopic = mqttTopic;
+    }
+
+    public String getMqttTopic() {
+        return this.mqttTopic;
+    }
 
     public void setDatabase(FirebaseDatabase database) { this.database = database; }
 

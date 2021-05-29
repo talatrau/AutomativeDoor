@@ -1,7 +1,5 @@
 package com.example.automativedoor.EntityClass;
 
-import java.util.List;
-
 public class Account {
     private String email;
     private String pass;
@@ -32,10 +30,6 @@ public class Account {
     }
 
     public boolean pinVerify(String pin) {
-        return this.pin == pin;
-    }
-
-    public boolean passVerify(String pass) {
-        return this.pass == pass;
+        return this.pin.equals(pin);
     }
 }

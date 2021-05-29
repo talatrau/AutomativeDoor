@@ -17,36 +17,16 @@ import java.nio.charset.Charset;
 
 public class MQTTServer {
     final String serverUri ="tcp://io.adafruit.com:1883";
-    final String clientId ="abcxyz";
     final String username ="CongTuVu";
-    final String password ="aio_AwHu03uY2aZmyeg92ojd3vB2zXn4";
+    final String password ="aio_EjgB51dD1HrCSfSVnqjE06oMKn8O";
+    String clientId;
 
     public MqttAndroidClient mqttAndroidClient;
 
-    public MQTTServer(Context context) {
+    public MQTTServer(Context context, String clientId) {
+        this.clientId = clientId;
         this.mqttAndroidClient = new MqttAndroidClient(context, this.serverUri, this.clientId);
         connect();
-        this.mqttAndroidClient.setCallback(new MqttCallbackExtended() {
-            @Override
-            public void connectComplete(boolean reconnect, String serverURI) {
-                Log.w("mqtt", serverURI);
-            }
-
-            @Override
-            public void connectionLost(Throwable cause) {
-                Log.w("mqtt", "lost connection");
-            }
-
-            @Override
-            public void messageArrived(String topic, MqttMessage message) throws Exception {
-
-            }
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken token) {
-
-            }
-        });
     }
 
     public void setCallback(MqttCallbackExtended callback) {
@@ -99,6 +79,14 @@ public class MQTTServer {
         } catch (MqttException e) {
             Log.e("Exceptionstsubscribing", e.toString());
             e.printStackTrace();
+        }
+    }
+
+    public void unsubscribeToTopic(String topic) {
+        try {
+            mqttAndroidClient.unsubscribe(topic);
+        } catch (MqttException e) {
+            Log.e("Topic not exist", e.toString());
         }
     }
 
