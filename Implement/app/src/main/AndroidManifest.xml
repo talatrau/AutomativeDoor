@@ -50,7 +50,7 @@
         <activity android:name=".Servo" android:label="@string/servo" />
         <activity android:name=".Speaker" android:label="@string/speaker" />
         <activity android:name=".pin" android:label="@string/pin" />
-
+        <activity android:name=".PinCreate" android:label="@string/pincreate" />
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
         <service android:name="com.example.automativedoor.Control.SensorService" android:enabled="true" android:exported="true" />

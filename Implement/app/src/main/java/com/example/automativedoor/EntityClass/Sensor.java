@@ -64,6 +64,14 @@ public class Sensor extends Component {
     }
 
     @Override
+    public void updateName(String name) {
+        super.updateName(name);
+        DatabaseReference reference = database.getReference("Component").child(UserController.getInstance().getHash()).child("Sensor");
+        reference.child(this.currentIndex).child("name").setValue(name);
+    }
+
+
+    @Override
     protected void saveHistory() {
         DatabaseReference reference = database.getReference("SensorHis").child(UserController.getInstance().getHash()).child(this.deviceID).child(String.valueOf(this.currentHis));
         reference.setValue(this.sensorHis);

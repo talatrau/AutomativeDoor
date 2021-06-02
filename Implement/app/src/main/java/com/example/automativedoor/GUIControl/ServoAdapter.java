@@ -1,6 +1,8 @@
 package com.example.automativedoor.GUIControl;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.CountDownTimer;
@@ -10,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -108,6 +111,27 @@ public class ServoAdapter extends BaseAdapter {
                     public void onFinish() {notify.cancel();}
                 }.start();
 
+            }
+        });
+
+        holder.txtName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Set Device Name");
+                final EditText input = new EditText(context);
+                builder.setView(input);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String name = input.getText().toString();
+                        servos.get(position).updateName(name);
+                        holder.txtName.setText(name);
+                    }
+                });
+
+                builder.setNegativeButton("Dismiss", null);
+                builder.create().show();
             }
         });
 

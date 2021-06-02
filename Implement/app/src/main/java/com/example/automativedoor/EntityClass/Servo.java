@@ -33,6 +33,13 @@ public class Servo extends Component {
     }
 
     @Override
+    public void updateName(String name) {
+        super.updateName(name);
+        DatabaseReference reference = database.getReference("Component").child(UserController.getInstance().getHash()).child("Servo");
+        reference.child(this.currentIndex).child("name").setValue(name);
+    }
+
+    @Override
     protected void saveHistory() {
         DatabaseReference reference = database.getReference("ServoHis").child(UserController.getInstance().getHash()).child(this.deviceID).child(String.valueOf(this.currentHis));
         reference.setValue(this.servoHis);

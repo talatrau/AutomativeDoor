@@ -1,7 +1,5 @@
 package com.example.automativedoor.EntityClass;
 
-import android.util.Log;
-
 import com.google.firebase.database.FirebaseDatabase;
 
 public abstract class Component {
@@ -49,6 +47,10 @@ public abstract class Component {
 
     public String getName() {
         return this.name;
+    }
+
+    protected void updateName(String name) {
+        this.name = name;
     }
 
     protected abstract void saveHistory();

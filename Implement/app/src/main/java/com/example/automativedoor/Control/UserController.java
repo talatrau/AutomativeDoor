@@ -1,6 +1,5 @@
 package com.example.automativedoor.Control;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -21,6 +20,7 @@ import com.example.automativedoor.EntityClass.Servo;
 import com.example.automativedoor.EntityClass.ServoHis;
 import com.example.automativedoor.EntityClass.Speaker;
 import com.example.automativedoor.EntityClass.SpeakerHis;
+import com.example.automativedoor.R;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -36,6 +36,9 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -57,8 +60,10 @@ public class UserController {
     static private UserController instance;
     private DatabaseDriver driver;
     private String hash;
-    private MQTTServer mqttServer;
+    private MQTTServer mqttServer_1;
+    private MQTTServer mqttServer_2;
     private int serviceCount = 0;
+
 
     public List<SensorHis> sensorHisList;
     public List<ServoHis> servoHisList;
@@ -104,23 +109,27 @@ public class UserController {
                 context.startService(new Intent(context, SensorService.class));
             }
             this.serviceCount += 1;
-            this.mqttServer.subscribeToTopic(feedKey);
+            this.mqttServer_2.subscribeToTopic(feedKey);
         }
         else {
             if (this.serviceCount == 1) {
                 context.stopService(new Intent(context, SensorService.class));
             }
             this.serviceCount -= 1;
-            this.mqttServer.unsubscribeToTopic(feedKey);
+            this.mqttServer_2.unsubscribeToTopic(feedKey);
         }
     }
 
     public void closeMqttConnection() {
         try {
             if (serviceCount == 0) {
-                this.mqttServer.mqttAndroidClient.disconnect();
+                this.mqttServer_1.mqttAndroidClient.disconnect();
+                this.mqttServer_1 = null;
+
+                this.mqttServer_2.mqttAndroidClient.disconnect();
+                this.mqttServer_2 = null;
+
                 Log.e("mqtt connection", "disconnected");
-                this.mqttServer = null;
             }
         } catch (MqttException e) {
             Log.e("Error when close mqtt", e.toString());
@@ -128,11 +137,14 @@ public class UserController {
     }
 
     public void setMqttServer() {
-        if (this.mqttServer == null) {
-            Log.e("mqtt connection", "connected");
-            this.mqttServer = new MQTTServer(context, "mainMqttService");
+        if (this.mqttServer_2 == null) {
+            this.mqttServer_2 = new MQTTServer(context, "MqttService1", "1", "KEY");
             this.trackingSensor();
         }
+        if (this.mqttServer_1 == null) {
+            this.mqttServer_1 = new MQTTServer(context, "MqttService", "0", "KEY");
+        }
+        Log.e("mqtt connection", "connected");
     }
 
     public String getHash() {
@@ -148,7 +160,7 @@ public class UserController {
     public void alarmSpeaker(boolean signal, int position) {
         String mess = this.speakerList.get(position).alarm(signal);
         String topic = this.speakerList.get(position).getMqttTopic();
-        this.mqttServer.publishMqtt(mess, topic);
+        this.mqttServer_1.publishMqtt(mess, topic);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -170,7 +182,7 @@ public class UserController {
         Log.e("open the door", "message");
         if (this.servoList.get(position).toggle(true)) {
             String topic = this.servoList.get(position).getMqttTopic();
-            this.mqttServer.publishMqtt("{\n" +
+            this.mqttServer_2.publishMqtt("{\n" +
                     "\"id\":\"17\",\n" +
                     "\"name\":\"SERVO\",\n" +
                     "\"data\":\"180\",\n" +
@@ -186,7 +198,7 @@ public class UserController {
         Log.e("close the door", "message");
         if (this.servoList.get(position).toggle(false)) {
             String topic = this.servoList.get(position).getMqttTopic();
-            this.mqttServer.publishMqtt("{\n" +
+            this.mqttServer_2.publishMqtt("{\n" +
                     "\"id\":\"17\",\n" +
                     "\"name\":\"SERVO\",\n" +
                     "\"data\":\"0\",\n" +
@@ -198,7 +210,7 @@ public class UserController {
     }
 
     public void trackingSensor() {
-        mqttServer.setCallback(new MqttCallbackExtended() {
+        mqttServer_2.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
                 Log.w("mqtt", serverURI);
@@ -206,7 +218,7 @@ public class UserController {
 
             @Override
             public void connectionLost(Throwable cause) {
-
+                Log.w("Lost mqtt", cause.toString());
             }
 
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -218,7 +230,7 @@ public class UserController {
                     if (sensorList.get(i).getMqttTopic().equals(topic)) index = i;
                 }
                 String data = jsonObject.getString("data");
-                Log.w("message arrived", data);
+                Log.w("message arrived", message.toString());
                 sensorList.get(index).processConnect(data);
             }
 
@@ -231,8 +243,40 @@ public class UserController {
     }
 
     public void sendResponse(int score, String text) {
-        Response response = new Response(score, text);
-        driver.saveResponse(response);
+        String data = "";
+        String[] tokens = text.toLowerCase().split("[^a-zA-Z]+");
+        if (tokens.length > 0) {
+            InputStream inputStream = context.getResources().openRawResource(R.raw.spam);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            if (inputStream != null) {
+                try {
+                    double spamProb = 1;
+                    double hamProb = 1;
+                    while ((data = reader.readLine()) != null) {
+                        String[] split = data.split("\t");
+                        String word = split[0];
+                        for (int i = 0; i < tokens.length; i++) {
+                            if (tokens[i].equals(word)) {
+                                double spam = Double.parseDouble(split[2]) * 10000;
+                                double ham = Double.parseDouble(split[1]) * 10000;
+                                spamProb = spamProb * spam;
+                                hamProb = hamProb * ham;
+                            }
+                        }
+                    }
+                    spamProb = spamProb * 0.3;
+                    hamProb = hamProb * 0.7;
+                    if (hamProb > spamProb) {
+                        Response response = new Response(score, text);
+                        driver.saveResponse(response);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Log.e("cannot open", "spam.txt");
+            }
+        }
     }
 
     public void scheduleSensor(LocalDateTime time) {
@@ -252,15 +296,14 @@ public class UserController {
         driver.getHistory(typ, amount);
     }
 
-    public boolean setup() {
+    public DatabaseReference setup() {
         this.hash = md5Hash(fauth.getCurrentUser().getEmail());
-        if (hash == null) {
-            return false;
-        } else {
-            driver.readComponent();
-            driver.readUser();
-            return true;
-        }
+        driver.readComponent();
+        return  driver.readUser();
+    }
+
+    public void updateUser() {
+        driver.writeUser();
     }
 
     public void forgotPass(String email, String pin) {
@@ -527,6 +570,10 @@ public class UserController {
             reference.setValue(response);
         }
 
+        public void writeUser() {
+            ref = database.getReference("User").child(hash);
+            ref.child("pin").setValue(user.getPin());
+        }
     }
 
     class SendMail extends AsyncTask<Void, Void, String> {

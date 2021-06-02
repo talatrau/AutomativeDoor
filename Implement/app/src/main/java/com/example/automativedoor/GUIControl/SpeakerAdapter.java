@@ -1,11 +1,14 @@
 package com.example.automativedoor.GUIControl;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -82,6 +85,27 @@ public class SpeakerAdapter extends BaseAdapter {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 UserController.getInstance().setSpeaker(position, progressChangedValue);
+            }
+        });
+
+        holder.txtName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Set Device Name");
+                final EditText input = new EditText(context);
+                builder.setView(input);
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String name = input.getText().toString();
+                        speakers.get(position).updateName(name);
+                        holder.txtName.setText(name);
+                    }
+                });
+
+                builder.setNegativeButton("Dismiss", null);
+                builder.create().show();
             }
         });
 

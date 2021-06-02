@@ -1,22 +1,21 @@
 package com.example.automativedoor;
 import com.example.automativedoor.Control.UserController;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
+
+import com.google.firebase.database.DataSnapshot;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Handler;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -28,7 +27,7 @@ import android.widget.Toast;
 
 
 public class login extends AppCompatActivity {
-    // ctv54066034@gmail.com
+
     private UserController controller = UserController.getInstance();
 
     @Override
@@ -83,17 +82,21 @@ public class login extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            if (controller.setup()) {
-                                Toast.makeText(login.this, "Welcome back! " + email, Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(getApplicationContext(), HomePage.class));
-                                finish();
-                            } else {
-                                Toast.makeText(login.this, "Something went wrong! Please contact us for more information!", Toast.LENGTH_LONG).show();
-                                contactShow();
-                                controller.fauth.signOut();
-                            }
+                            controller.setup().get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                                @Override
+                                public void onSuccess(DataSnapshot dataSnapshot) {
+                                    if (controller.user.getPin() == null) {
+                                        startActivity(new Intent(getApplicationContext(), PinCreate.class));
+                                        finish();
+                                    } else {
+                                        Toast.makeText(login.this, "Welcome back! " + email, Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(getApplicationContext(), HomePage.class));
+                                        finish();
+                                    }
+                                }
+                            });
                         } else {
-                            Toast.makeText(login.this, "Error Email or Password! ", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(login.this, "Wrong Email or Password! ", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

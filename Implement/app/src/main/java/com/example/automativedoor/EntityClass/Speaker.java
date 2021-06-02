@@ -62,4 +62,11 @@ public class Speaker extends Component {
         DatabaseReference reference = database.getReference("SpeakerHis").child(UserController.getInstance().getHash()).child(this.deviceID).child(String.valueOf(this.currentHis));
         reference.setValue(this.speakerHis);
     }
+
+    @Override
+    public void updateName(String name) {
+        super.updateName(name);
+        DatabaseReference reference = database.getReference("Component").child(UserController.getInstance().getHash()).child("Speaker");
+        reference.child(this.currentIndex).child("name").setValue(name);
+    }
 }

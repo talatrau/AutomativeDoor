@@ -17,15 +17,38 @@ import java.nio.charset.Charset;
 
 public class MQTTServer {
     final String serverUri ="tcp://io.adafruit.com:1883";
-    final String username ="CongTuVu";
-    final String password ="aio_EjgB51dD1HrCSfSVnqjE06oMKn8O";
+    String username;
+    String password;
     String clientId;
 
     public MqttAndroidClient mqttAndroidClient;
 
-    public MQTTServer(Context context, String clientId) {
+    public MQTTServer(Context context, String clientId, String username, String password) {
         this.clientId = clientId;
+        this.username = username;
+        this.password = password;
         this.mqttAndroidClient = new MqttAndroidClient(context, this.serverUri, this.clientId);
+        this.mqttAndroidClient.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean reconnect, String serverURI) {
+                Log.w("mqtt", serverURI);
+            }
+
+            @Override
+            public void connectionLost(Throwable cause) {
+                Log.w("Lost mqtt", cause.toString());
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
+
+            }
+        });
         connect();
     }
 
