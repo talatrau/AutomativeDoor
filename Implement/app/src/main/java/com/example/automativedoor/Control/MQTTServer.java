@@ -20,18 +20,20 @@ public class MQTTServer {
     String username;
     String password;
     String clientId;
+    String topic;
 
     public MqttAndroidClient mqttAndroidClient;
 
-    public MQTTServer(Context context, String clientId, String username, String password) {
+    public MQTTServer(Context context, String clientId, String username, String password, String topic) {
         this.clientId = clientId;
         this.username = username;
         this.password = password;
+        this.topic = topic;
         this.mqttAndroidClient = new MqttAndroidClient(context, this.serverUri, this.clientId);
         this.mqttAndroidClient.setCallback(new MqttCallbackExtended() {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
-                Log.w("mqtt", serverURI);
+                Log.w("mqtt", clientId);
             }
 
             @Override
@@ -72,6 +74,7 @@ public class MQTTServer {
                     disconnectedBufferOptions.setPersistBuffer(false);
                     disconnectedBufferOptions.setDeleteOldestMessages(false);
                     mqttAndroidClient.setBufferOpts(disconnectedBufferOptions);
+                    if (!topic.isEmpty()) subcribeToTopic();
                 }
 
                 @Override
@@ -85,17 +88,17 @@ public class MQTTServer {
         }
     }
 
-    public void subscribeToTopic(String subscriptionTopic) {
+    private void subcribeToTopic() {
         try {
-            mqttAndroidClient.subscribe(subscriptionTopic, 0, null, new IMqttActionListener() {
+            mqttAndroidClient.subscribe(this.topic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.w("Mqtt", "Subscribed!");
+                    Log.w("Mqtt", "Subscribed! " + topic);
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.w("Mqtt", "Subscribedfail");
+                    Log.w("Mqtt", "Subscribedfail " + topic);
                 }
             });
 

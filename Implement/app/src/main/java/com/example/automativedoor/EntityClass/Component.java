@@ -5,33 +5,15 @@ import com.google.firebase.database.FirebaseDatabase;
 public abstract class Component {
     protected String deviceID;
     protected String name;
-    protected boolean state;
     protected int currentHis;
     protected String currentIndex;
     protected FirebaseDatabase database;
-    protected String mqttTopic;
-
-    public void setMqttTopic(String mqttTopic) {
-        this.mqttTopic = mqttTopic;
-    }
-
-    public String getMqttTopic() {
-        return this.mqttTopic;
-    }
 
     public void setDatabase(FirebaseDatabase database) { this.database = database; }
 
     public void setCurrentIndex(String index) { this.currentIndex = index; }
 
     public void setCurrentHis(int index) { this.currentHis = index; }
-
-    public void setState(boolean state) {
-        this.state = state;
-    }
-
-    public boolean getState() {
-        return this.state;
-    }
 
     public void setDeviceID(String deviceID) {
         this.deviceID = deviceID;

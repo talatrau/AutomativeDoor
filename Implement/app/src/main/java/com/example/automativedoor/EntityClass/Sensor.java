@@ -18,49 +18,33 @@ import java.util.ArrayList;
 public class Sensor extends Component {
 
     SensorHis sensorHis;
-    private String connectID;
-    private int connectIndex;
 
-    private CountDownTimer counter;
+    private int position;
+    private int mode;
+    private int suspicious = 0;
 
-    public void setConnectID(String device) {
-        this.connectID = device;
-        if (connectID.contains("speaker")) connectIndex = UserController.getInstance().getSpeakerIndex(device);
-        else if (connectID.contains("servo")) {
-            connectIndex = UserController.getInstance().getServoIndex(device);
-            this.counter = new CountDownTimer(5000, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) { }
-
-                @RequiresApi(api = Build.VERSION_CODES.O)
-                @Override
-                public void onFinish() {
-                    Log.e("counter", "finished");
-                    UserController.getInstance().closeDoor(connectIndex);
-                }
-            };
-        }
+    public void setMode(int mode) {
+        this.mode = mode;
     }
 
-    public String getConnectID() {
-        return this.connectID;
+    public int getMode() {
+        return mode;
     }
 
-    public void setSensorHis(SensorHis his) {
-        this.sensorHis = his;
-        this.currentHis -= 1;
+    public void setPosition(int position) {
+        this.position = position;
     }
+
+    public int getPosition() {
+        return this.position;
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public boolean toggle(boolean signal) {
-        if (this.state == signal) {
-            return false;
-        } else {
-            this.state = signal;
-            this.genHistory();
-            UserController.getInstance().setMqttSubcribe(this.mqttTopic, signal);
-            return true;
-        }
+    public void toggle(int mode) {
+        this.setMode(mode);
+        database.getReference("Component").child(UserController.getInstance().getHash()).child("Sensor")
+                .child(this.currentIndex).child("mode").setValue(mode);
     }
 
     @Override
@@ -71,58 +55,48 @@ public class Sensor extends Component {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void saveHistory() {
-        DatabaseReference reference = database.getReference("SensorHis").child(UserController.getInstance().getHash()).child(this.deviceID).child(String.valueOf(this.currentHis));
-        reference.setValue(this.sensorHis);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void saveObstacle() {
-        if (this.sensorHis.obstacle == null) {
-            this.sensorHis.obstacle = new ArrayList<String>();
+        this.currentHis += 1;
+        if (this.currentHis == 0) {
+            database.getReference("SensorHis").child(UserController.getInstance()
+                    .getHash()).child(this.deviceID).child("deviceID").setValue(this.deviceID);
+            database.getReference("SensorHis").child(UserController.getInstance()
+                    .getHash()).child(this.deviceID).child("name").setValue(this.name);
         }
-        this.sensorHis.obstacle.add(LocalDateTime.now().toString().substring(0, 19));
-        this.saveHistory();
-    }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void genHistory() {
-        DatabaseReference reference = database.getReference("Component").child(UserController.getInstance().getHash()).child("Sensor");
-        reference.child(this.currentIndex).setValue(this);
-        if (this.state) {
-            this.currentHis += 1;
-            this.sensorHis = new SensorHis();
-            sensorHis.deviceID = this.deviceID;
-            sensorHis.name = this.name;
-            sensorHis.sTime = LocalDateTime.now().toString().substring(0, 19);
-            this.saveHistory();
-        } else {
-            this.sensorHis.eTime = LocalDateTime.now().toString().substring(0, 19);
-            this.saveHistory();
-            this.sensorHis = null;
-        }
+
+        String time = LocalDateTime.now().toString().substring(0, 19);
+        database.getReference("SensorHis").child(UserController.getInstance()
+                .getHash()).child(this.deviceID).child("obstacle").child(String.valueOf(this.currentHis)).setValue(time);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void processConnect(String data) {
-        if (this.connectID.contains("speaker")) {
-            if (!data.equals("00")) {
-                this.saveObstacle();
-                UserController.getInstance().alarmSpeaker(true, this.connectIndex);
+        if (this.mode == 2) {
+            if (!data.equals("0")) {
+                if (this.position == 1) UserController.getInstance().alarmSpeaker(true);
+                else if (this.position == 0) {
+                    this.suspicious += 1;
+                    if (this.suspicious > 5) {
+                        this.suspicious = 0;
+                        UserController.getInstance().alarmSpeaker(true);
+                    }
+                }
+                this.saveHistory();
             }
             else {
-                UserController.getInstance().alarmSpeaker(false, this.connectIndex);
+                this.suspicious = 0;
+                UserController.getInstance().alarmSpeaker(false);
             }
         }
-        else if (this.connectID.contains("servo")) {
-            if (!data.equals("00")) {
-                this.saveObstacle();
-                UserController.getInstance().openDoor(this.connectIndex);
-                this.counter.cancel();
-            }
-            else {
-                this.counter.start();
+        else if (this.mode == 1) {
+            Log.e("in process", "connect");
+            if (data.equals("1")) {
+                this.saveHistory();
+                UserController.getInstance().openDoor();
+                Log.e("data equal", "one");
             }
         }
     }

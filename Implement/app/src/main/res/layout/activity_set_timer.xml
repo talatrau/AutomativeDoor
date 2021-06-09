@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SetTimer"
+    android:background="@color/blue_grey">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/setTimer_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:textSize="15dp"
+            android:textColor="@color/orange"
+            android:layout_alignParentLeft="true"
+            android:padding="20dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Time"
+            android:textSize="15dp"
+            android:textColor="@color/white"
+            android:layout_centerHorizontal="true"
+            android:padding="20dp" />
+
+        <TextView
+            android:id="@+id/settimer_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:textSize="15dp"
+            android:textColor="@color/orange"
+            android:layout_alignParentRight="true"
+            android:padding="20dp"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/setTimer_settimer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="50dp"
+        android:orientation="vertical">
+
+        <TimePicker
+            android:id="@+id/setTimer_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:timePickerMode="spinner" />
+
+        <RelativeLayout
+            android:id="@+id/setTimer_repeat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/timer_border"
+            android:clickable="true"
+            android:onClick="repeatClick"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/setTimer_txt_repeat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Repeat"
+                android:textSize="20dp"
+                android:textColor="@color/white"
+                android:paddingLeft="10dp"
+                android:layout_alignParentLeft="true"/>
+
+            <TextView
+                android:id="@+id/setTimer_txt_repeat_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="none >"
+                android:textSize="20dp"
+                android:textColor="#7FFFFFFF"
+                android:layout_alignParentRight="true"
+                android:paddingRight="10dp"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/setTimer_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/timer_border"
+            android:clickable="true"
+            android:onClick="labelClick"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/setTimer_txt_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Label"
+                android:textSize="20dp"
+                android:textColor="@color/white"
+                android:paddingLeft="10dp"
+                android:layout_alignParentLeft="true"/>
+
+            <TextView
+                android:id="@+id/setTimer_txt_label_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="none >"
+                android:textSize="20dp"
+                android:textColor="#7FFFFFFF"
+                android:layout_alignParentRight="true"
+                android:paddingRight="10dp"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/setTimer_action"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/timer_border"
+            android:clickable="true"
+            android:onClick="labelClick"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Action"
+                android:textSize="20dp"
+                android:textColor="@color/white"
+                android:paddingLeft="10dp"
+                android:layout_alignParentLeft="true"/>
+
+            <Switch
+                android:id="@+id/setTimer_action_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:switchMinWidth="75dp"
+                android:layout_alignParentRight="true"
+                android:textOff="OFF"
+                android:textOn="ON"
+                android:showText="true"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@drawable/timer_border"/>
+
+    </LinearLayout>
+
+    <com.baoyz.swipemenulistview.SwipeMenuListView
+        android:id="@+id/setTimer_listview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/setTimer_settimer"
+        android:layout_marginTop="30dp"
+        android:layout_marginHorizontal="20dp"/>
+
+</RelativeLayout>

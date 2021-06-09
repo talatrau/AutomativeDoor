@@ -1,9 +1,11 @@
 package com.example.automativedoor;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -16,10 +18,12 @@ import com.example.automativedoor.Control.UserController;
 
 public class HomePage extends AppCompatActivity {
 
+    TextView component_txt, history_txt, response_txt;
+    ImageButton component_bnt, history_bnt, response_bnt;
+
     private boolean doubleBack = false;
 
     private UserController controller = UserController.getInstance();
-
 
     private void componentClick() {
         startActivity(new Intent(this, Component.class));
@@ -30,9 +34,10 @@ public class HomePage extends AppCompatActivity {
     }
 
     private void responseClick() {
-        startActivity(new Intent(this, feedback.class));
+        startActivityForResult(new Intent(this, feedback.class), 0);
     }
 
+    private CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +52,8 @@ public class HomePage extends AppCompatActivity {
     }
 
     private void setUpButtonEvent() {
-        ImageButton component_bnt = (ImageButton) findViewById(R.id.component_button);
-        TextView component_txt = (TextView) findViewById(R.id.component_button_text);
+        component_bnt = (ImageButton) findViewById(R.id.component_button);
+        component_txt = (TextView) findViewById(R.id.component_button_text);
 
         component_txt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,8 +73,8 @@ public class HomePage extends AppCompatActivity {
             }
         });
 
-        ImageButton history_bnt = (ImageButton) findViewById(R.id.history_button);
-        TextView history_txt = (TextView) findViewById(R.id.history_button_text);
+        history_bnt = (ImageButton) findViewById(R.id.history_button);
+        history_txt = (TextView) findViewById(R.id.history_button_text);
 
         history_bnt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,8 +94,8 @@ public class HomePage extends AppCompatActivity {
             }
         });
 
-        ImageButton response_bnt = (ImageButton) findViewById(R.id.response_button);
-        TextView response_txt = (TextView) findViewById(R.id.response_button_text);
+        response_bnt = (ImageButton) findViewById(R.id.response_button);
+        response_txt = (TextView) findViewById(R.id.response_button_text);
 
         response_bnt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,6 +114,19 @@ public class HomePage extends AppCompatActivity {
                 responseClick();
             }
         });
+
+        countDownTimer = new CountDownTimer(30000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                response_bnt.setEnabled(true);
+                response_txt.setEnabled(true);
+            }
+        };
     }
 
     @Override
@@ -152,6 +170,23 @@ public class HomePage extends AppCompatActivity {
         super.onDestroy();
         UserController.getInstance().closeMqttConnection();
         Log.e("Homepage in state: ", "onDestroy");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 0)  {
+            if (resultCode == AppCompatActivity.RESULT_OK) {
+                Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
+            }
+            else if (resultCode == AppCompatActivity.RESULT_CANCELED) {
+                Toast.makeText(this, "SPAM", Toast.LENGTH_SHORT).show();
+                response_bnt.setEnabled(false);
+                response_txt.setEnabled(false);
+                countDownTimer.start();
+            }
+        }
     }
 
     @Override

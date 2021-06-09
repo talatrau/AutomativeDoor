@@ -1,18 +1,29 @@
 package com.example.automativedoor;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
+import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.EntityClass.Sensor;
@@ -26,6 +37,8 @@ import java.util.ArrayList;
 public class Component extends AppCompatActivity {
     private ListView listView;
 
+    private ArrayList<Servo> servos;
+    private ArrayList<Speaker> speakers;
     private ArrayList<com.example.automativedoor.EntityClass.Component> components;
 
     private ComponentAdapter adapter;
@@ -55,7 +68,7 @@ public class Component extends AppCompatActivity {
 
         this.associate();
 
-        adapter = new ComponentAdapter(this, R.layout.stream_component, components);
+        adapter = new ComponentAdapter(this, R.layout.stream_component, components, servos, speakers);
         listView.setAdapter(adapter);
 
         this.setUpButtonEvent();
@@ -133,28 +146,32 @@ public class Component extends AppCompatActivity {
                 swipe.setRefreshing(false);
             }
         });
+
+        TextView txt_mode = (TextView) findViewById(R.id.component_mode);
+        RelativeLayout layout = findViewById(R.id.component_layout_mode);
+        if (controller.getMode() == 2) {
+            txt_mode.setText("Anti Thief");
+            layout.setBackgroundResource(R.drawable.component_off);
+        }
+        else if (controller.getMode() == 1) {
+            txt_mode.setText("Welcome Guest");
+            layout.setBackgroundResource(R.drawable.component_on);
+        }
     }
 
     private void associate() {
         listView = (ListView) findViewById(R.id.component_listview);
-        components = new ArrayList<com.example.automativedoor.EntityClass.Component>();
-        for (Sensor sensor : controller.sensorList) {
-            components.add(sensor);
-        }
+        this.servos = controller.servoList;
+        this.speakers = controller.speakerList;
 
-        for (Speaker speaker : controller.speakerList) {
-            components.add(speaker);
-        }
-
-        for (Servo servo : controller.servoList) {
-            components.add(servo);
-        }
-
+        this.components = new ArrayList<com.example.automativedoor.EntityClass.Component>();
+        this.components.addAll(this.speakers);
+        this.components.addAll(this.servos);
     }
 
     private void refreshItem() {
         this.associate();
-        adapter = new ComponentAdapter(this, R.layout.stream_component, components);
+        adapter = new ComponentAdapter(this, R.layout.stream_component, components, servos, speakers);
         listView.setAdapter(adapter);
     }
 
@@ -209,9 +226,147 @@ public class Component extends AppCompatActivity {
         if (resultCode == AppCompatActivity.RESULT_OK) {
             final String result = data.getStringExtra(pin.PIN_RESULT);
             if (result.equals("pin correct")) {
-                if (requestCode == 1) startActivity(new Intent(this, com.example.automativedoor.Sensor.class));
-                else if (requestCode == 2) startActivity(new Intent(this, com.example.automativedoor.Speaker.class));
-                else if (requestCode == 3) startActivity(new Intent(this, com.example.automativedoor.Servo.class));
+                if (requestCode == 1) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    ViewGroup viewGroup = findViewById(android.R.id.content);
+                    View view = LayoutInflater.from(this).inflate(R.layout.sensor_mode, viewGroup, false);
+                    builder.setView(view);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+
+                    RadioButton anti_thief = (RadioButton) alertDialog.findViewById(R.id.sensor_anti_thief);
+                    RadioButton welcome = (RadioButton) alertDialog.findViewById(R.id.sensor_welcome);
+                    Button button = (Button) alertDialog.findViewById(R.id.sensor_confirm);
+                    ImageView reminder = (ImageView) alertDialog.findViewById(R.id.sensor_reminder);
+
+                    reminder.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alertDialog.dismiss();
+                            startActivity(new Intent(getApplicationContext(), SetTimer.class));
+                        }
+                    });
+
+                    TextView txt_mode = (TextView) findViewById(R.id.component_mode);
+                    RelativeLayout layout = findViewById(R.id.component_layout_mode);
+                    if (controller.getMode() == 2) {
+                        anti_thief.setChecked(true);
+                    }
+                    else if (controller.getMode() == 1) {
+                        welcome.setChecked(true);
+                    }
+
+                    button.setOnClickListener(new View.OnClickListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.O)
+                        @Override
+                        public void onClick(View v) {
+                            alertDialog.dismiss();
+                            int mode = 0;
+                            if (anti_thief.isChecked()) {
+                                mode = 2;
+                                txt_mode.setText("Anti Thief");
+                                layout.setBackgroundResource(R.drawable.component_off);
+                            }
+                            else if (welcome.isChecked()) {
+                                mode = 1;
+                                txt_mode.setText("Welcome Guest");
+                                layout.setBackgroundResource(R.drawable.component_on);
+                            }
+                            controller.changeMode(mode);
+                            refreshItem();
+                        }
+                    });
+                }
+                else if (requestCode == 2) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    ViewGroup viewGroup = findViewById(android.R.id.content);
+                    View view = LayoutInflater.from(this).inflate(R.layout.stream_speaker, viewGroup, false);
+                    builder.setView(view);
+                    builder.setPositiveButton("Ok", null);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+
+                    Speaker speaker = controller.speakerList.get(0);
+                    TextView textView = alertDialog.findViewById(R.id.speaker_name);
+                    textView.setText(speaker.getName());
+
+                    SeekBar seekBar = alertDialog.findViewById(R.id.speaker_seekbar);
+                    seekBar.setProgress(speaker.getVolume());
+
+                    seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        int progressChangedValue = 0;
+
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                            progressChangedValue = progress;
+                        }
+
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {
+
+                        }
+
+                        @RequiresApi(api = Build.VERSION_CODES.O)
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {
+                            UserController.getInstance().setSpeaker(0, progressChangedValue);
+                        }
+                    });
+
+                }
+                else if (requestCode == 3) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    ViewGroup viewGroup = findViewById(android.R.id.content);
+                    View view = LayoutInflater.from(this).inflate(R.layout.stream_servo, viewGroup, false);
+                    builder.setView(view);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+
+                    Servo servo = controller.servoList.get(0);
+                    Button close = alertDialog.findViewById(R.id.servo_close);
+                    Button open = alertDialog.findViewById(R.id.servo_open);
+                    TextView txt_name = alertDialog.findViewById(R.id.servo_name);
+
+                    txt_name.setText(servo.getName());
+                    open.setOnClickListener(new View.OnClickListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.O)
+                        @Override
+                        public void onClick(View v) {
+                            open.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.bounce));
+                            Toast notify;
+                            if (UserController.getInstance().openDoor()) {
+                                notify = Toast.makeText(getApplicationContext(), "Door opened", Toast.LENGTH_SHORT);
+                                refreshItem();
+                            } else {
+                                notify = Toast.makeText(getApplicationContext(), "This door is already opened", Toast.LENGTH_SHORT);
+                            }
+                            new CountDownTimer(700, 1000) {
+                                public void onTick(long millisUntilFinished) {notify.show();}
+                                public void onFinish() {notify.cancel();}
+                            }.start();
+
+                        }
+                    });
+
+                    close.setOnClickListener(new View.OnClickListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.O)
+                        @Override
+                        public void onClick(View v) {
+                            close.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.bounce));
+                            Toast notify;
+                            if (UserController.getInstance().closeDoor()) {
+                                notify = Toast.makeText(getApplicationContext(), "Door closed", Toast.LENGTH_SHORT);
+                                refreshItem();
+                            } else {
+                                notify = Toast.makeText(getApplicationContext(), "This door is already closed", Toast.LENGTH_SHORT);
+                            }
+                            new CountDownTimer(700, 1000) {
+                                public void onTick(long millisUntilFinished) {notify.show();}
+                                public void onFinish() {notify.cancel();}
+                            }.start();
+                        }
+                    });
+                }
             }
             else if (result.equals("disable")) {
                 String content = "Ai do dang co gang truy cap vao thiet bi cua ban!!! <br> Hay co chinh sach bao ve ma PIN cua ban. <br>";

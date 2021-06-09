@@ -54,13 +54,18 @@ public class Speaker extends Component {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void saveHistory() {
-        Log.e("run", "ok");
-        this.speakerHis = new SpeakerHis();
-        speakerHis.deviceID = this.deviceID;
-        speakerHis.name = this.name;
-        speakerHis.time = LocalDateTime.now().toString().substring(0, 19);
-        DatabaseReference reference = database.getReference("SpeakerHis").child(UserController.getInstance().getHash()).child(this.deviceID).child(String.valueOf(this.currentHis));
-        reference.setValue(this.speakerHis);
+        this.currentHis += 1;
+        if (this.currentHis == 0) {
+            database.getReference("SpeakerHis").child(UserController.getInstance()
+                    .getHash()).child(this.deviceID).child("deviceID").setValue(this.deviceID);
+            database.getReference("SpeakerHis").child(UserController.getInstance()
+                    .getHash()).child(this.deviceID).child("name").setValue(this.name);
+        }
+
+
+        String time = LocalDateTime.now().toString().substring(0, 19);
+        database.getReference("SpeakerHis").child(UserController.getInstance()
+                .getHash()).child(this.deviceID).child("time").child(String.valueOf(this.currentHis)).setValue(time);
     }
 
     @Override

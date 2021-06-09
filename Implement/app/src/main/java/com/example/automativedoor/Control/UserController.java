@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import com.google.firebase.database.ValueEventListener;
 
+import org.eclipse.paho.android.service.MqttService;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -62,8 +64,22 @@ public class UserController {
     private String hash;
     private MQTTServer mqttServer_1;
     private MQTTServer mqttServer_2;
+    private MQTTServer mqttServer_3;
     private int serviceCount = 0;
+    private int mode = 0;
+    private CountDownTimer closeDoorCount = new CountDownTimer(10000, 1000) {
+        @Override
+        public void onTick(long millisUntilFinished) {
 
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        @Override
+        public void onFinish() {
+            Log.e("counter", "finish");
+            closeDoor();
+        }
+    };
 
     public List<SensorHis> sensorHisList;
     public List<ServoHis> servoHisList;
@@ -79,6 +95,9 @@ public class UserController {
 
     private UserController() {
         driver = new DatabaseDriver();
+        sensorHisList = new ArrayList<>();
+        servoHisList = new ArrayList<>();
+        speakerHisList = new ArrayList<>();
     }
 
     public static UserController getInstance() {
@@ -89,61 +108,41 @@ public class UserController {
         return instance;
     }
 
-    public int getSpeakerIndex(String deviceID) {
-        for (int i = 0; i < speakerList.size(); i++) {
-            if (speakerList.get(i).getDeviceID().equals(deviceID)) return i;
-        }
-        return -1;
-    }
-
-    public int getServoIndex(String deviceID) {
-        for (int i = 0; i < servoList.size(); i++) {
-            if (servoList.get(i).getDeviceID().equals(deviceID)) return i;
-        }
-        return -1;
-    }
-
-    public void setMqttSubcribe(String feedKey, boolean signal) {
-        if (signal) {
-            if (this.serviceCount == 0) {
-                context.startService(new Intent(context, SensorService.class));
-            }
-            this.serviceCount += 1;
-            this.mqttServer_2.subscribeToTopic(feedKey);
-        }
-        else {
-            if (this.serviceCount == 1) {
-                context.stopService(new Intent(context, SensorService.class));
-            }
-            this.serviceCount -= 1;
-            this.mqttServer_2.unsubscribeToTopic(feedKey);
-        }
+    public int getMode() {
+        return this.mode;
     }
 
     public void closeMqttConnection() {
-        try {
-            if (serviceCount == 0) {
+        if (this.mode == 1 || true) {
+            try {
                 this.mqttServer_1.mqttAndroidClient.disconnect();
                 this.mqttServer_1 = null;
-
+                this.mqttServer_3.mqttAndroidClient.disconnect();
+                this.mqttServer_3 = null;
                 this.mqttServer_2.mqttAndroidClient.disconnect();
                 this.mqttServer_2 = null;
-
-                Log.e("mqtt connection", "disconnected");
+            } catch (MqttException e) {
+                e.printStackTrace();
             }
-        } catch (MqttException e) {
-            Log.e("Error when close mqtt", e.toString());
         }
     }
 
     public void setMqttServer() {
+        boolean flag = false;
         if (this.mqttServer_2 == null) {
-            this.mqttServer_2 = new MQTTServer(context, "MqttService1", "1", "KEY");
-            this.trackingSensor();
+            this.mqttServer_2 = new MQTTServer(context, "MqttService1", "CongTuVu", "", "CongTuVu/feeds/automativedoor.sensorspeaker");
+            flag = true;
+            this.trackingSensor(0);
         }
         if (this.mqttServer_1 == null) {
-            this.mqttServer_1 = new MQTTServer(context, "MqttService", "0", "KEY");
+            this.mqttServer_1 = new MQTTServer(context, "MqttService", "CongTuVu", "", "");
         }
+        if (this.mqttServer_3 == null) {
+            this.mqttServer_3 = new MQTTServer(context, "MqttService2", "CongTuVu", "", "CongTuVu/feeds/automativedoor.sensorservo");
+            flag = true;
+            this.trackingSensor(1);
+        }
+        if (flag) this.context.startService(new Intent(context, SensorService.class));
         Log.e("mqtt connection", "connected");
     }
 
@@ -157,47 +156,45 @@ public class UserController {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void alarmSpeaker(boolean signal, int position) {
-        String mess = this.speakerList.get(position).alarm(signal);
-        String topic = this.speakerList.get(position).getMqttTopic();
+    public void alarmSpeaker(boolean signal) {
+        String mess = this.speakerList.get(0).alarm(signal);
+        String topic = "CongTuVu/feeds/automativedoor.buzzer";
         this.mqttServer_1.publishMqtt(mess, topic);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void turnOnSensor(int position) {
-        if (this.sensorList.get(position).toggle(true)) {
-            //this.sendDataMQTT("ON", "CongTuVu/feeds/automativedoor.sensor\n");
+    public void changeMode(int mode) {
+        if (this.mode != mode) {
+            this.mode = mode;
+            for (int i = 0; i < sensorList.size(); i++) {
+                sensorList.get(i).toggle(mode);
+            }
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void turnOffSensor(int position) {
-        if (this.sensorList.get(position).toggle(false)) {
-            //this.sendDataMQTT("OFF", "CongTuVu/feeds/automativedoor.sensor\n");
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public boolean openDoor(int position) {
+    public boolean openDoor() {
         Log.e("open the door", "message");
-        if (this.servoList.get(position).toggle(true)) {
-            String topic = this.servoList.get(position).getMqttTopic();
+        if (this.servoList.get(0).toggle(true)) {
+            closeDoorCount.cancel();
+            String topic = "CongTuVu/feeds/automativedoor.servo";
             this.mqttServer_2.publishMqtt("{\n" +
                     "\"id\":\"17\",\n" +
                     "\"name\":\"SERVO\",\n" +
                     "\"data\":\"180\",\n" +
                     "\"unit\":\"degree\"\n" +
                     "}\n", topic);
+            closeDoorCount.start();
             return true;
         }
         return false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public boolean closeDoor(int position) {
+    public boolean closeDoor() {
         Log.e("close the door", "message");
-        if (this.servoList.get(position).toggle(false)) {
-            String topic = this.servoList.get(position).getMqttTopic();
+        if (this.servoList.get(0).toggle(false)) {
+            String topic = "CongTuVu/feeds/automativedoor.servo";
             this.mqttServer_2.publishMqtt("{\n" +
                     "\"id\":\"17\",\n" +
                     "\"name\":\"SERVO\",\n" +
@@ -209,40 +206,74 @@ public class UserController {
         return false;
     }
 
-    public void trackingSensor() {
-        mqttServer_2.setCallback(new MqttCallbackExtended() {
-            @Override
-            public void connectComplete(boolean reconnect, String serverURI) {
-                Log.w("mqtt", serverURI);
-            }
-
-            @Override
-            public void connectionLost(Throwable cause) {
-                Log.w("Lost mqtt", cause.toString());
-            }
-
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void messageArrived(String topic, MqttMessage message) throws Exception {
-                JSONObject jsonObject = new JSONObject(message.toString());
-                int index = 0;
-                for (int i = 0; i < sensorList.size(); i++) {
-                    if (sensorList.get(i).getMqttTopic().equals(topic)) index = i;
+    public void trackingSensor(int position) {
+        if (position == 0) {
+            mqttServer_2.setCallback(new MqttCallbackExtended() {
+                @Override
+                public void connectComplete(boolean reconnect, String serverURI) {
+                    Log.w("mqtt", serverURI);
                 }
-                String data = jsonObject.getString("data");
-                Log.w("message arrived", message.toString());
-                sensorList.get(index).processConnect(data);
-            }
 
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken token) {
+                @Override
+                public void connectionLost(Throwable cause) {
+                    Log.w("Lost mqtt 2", cause.toString());
+                }
 
-            }
-        });
+                @RequiresApi(api = Build.VERSION_CODES.O)
+                @Override
+                public void messageArrived(String topic, MqttMessage message) throws Exception {
+                    JSONObject jsonObject = new JSONObject(message.toString());
+                    String data = jsonObject.getString("data");
+                    for (int i = 0; i < sensorList.size(); i++) {
+                        if (sensorList.get(i).getPosition() == 0) {
+                            sensorList.get(i).processConnect(data);
+                        }
+                    }
+                    Log.w("message arrived 2", message.toString());
+                }
+
+                @Override
+                public void deliveryComplete(IMqttDeliveryToken token) {
+
+                }
+            });
+        }
+        else if (position == 1) {
+            mqttServer_3.setCallback(new MqttCallbackExtended() {
+                @Override
+                public void connectComplete(boolean reconnect, String serverURI) {
+                    Log.w("mqtt", serverURI);
+                }
+
+                @Override
+                public void connectionLost(Throwable cause) {
+                    Log.w("Lost mqtt 3", cause.toString());
+                }
+
+                @RequiresApi(api = Build.VERSION_CODES.O)
+                @Override
+                public void messageArrived(String topic, MqttMessage message) throws Exception {
+                    Log.w("message arrived 3", message.toString());
+                    JSONObject jsonObject = new JSONObject(message.toString());
+                    String data = jsonObject.getString("data");
+                    for (int i = 0; i < sensorList.size(); i++) {
+                        if (sensorList.get(i).getPosition() == 1) {
+                            Log.e("found sensor", i + "");
+                            sensorList.get(i).processConnect(data);
+                        }
+                    }
+                }
+
+                @Override
+                public void deliveryComplete(IMqttDeliveryToken token) {
+
+                }
+            });
+        }
 
     }
 
-    public void sendResponse(int score, String text) {
+    public boolean sendResponse(int score, String text) {
         String data = "";
         String[] tokens = text.toLowerCase().split("[^a-zA-Z]+");
         if (tokens.length > 0) {
@@ -269,6 +300,7 @@ public class UserController {
                     if (hamProb > spamProb) {
                         Response response = new Response(score, text);
                         driver.saveResponse(response);
+                        return true;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -277,6 +309,8 @@ public class UserController {
                 Log.e("cannot open", "spam.txt");
             }
         }
+
+        return false;
     }
 
     public void scheduleSensor(LocalDateTime time) {
@@ -299,7 +333,7 @@ public class UserController {
     public DatabaseReference setup() {
         this.hash = md5Hash(fauth.getCurrentUser().getEmail());
         driver.readComponent();
-        return  driver.readUser();
+        return driver.readUser();
     }
 
     public void updateUser() {
@@ -386,7 +420,7 @@ public class UserController {
                         sensorList.add(sensor);
                         driver.getCurrentHis(0, sensor.getDeviceID(), sensorList.size() - 1);
                     }
-
+                    mode = sensorList.get(0).getMode();
                 }
 
                 @Override
@@ -454,15 +488,14 @@ public class UserController {
 
         public void getCurrentHis(int typ, String deviceID, int index) {
             if (typ == 0) {
-                database.getReference("SensorHis").child(hash).child(deviceID).limitToLast(1).addValueEventListener(new ValueEventListener() {
+                database.getReference("SensorHis").child(hash).child(deviceID).child("obstacle").limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        sensorList.get(index).setCurrentHis(-1);
+                        int hisIndex = -1;
                         for (DataSnapshot post : snapshot.getChildren()) {
-                            sensorList.get(index).setCurrentHis(Integer.parseInt(post.getKey()) + 1);
-                            sensorList.get(index).setSensorHis(post.getValue(SensorHis.class));
+                            hisIndex = Integer.parseInt(post.getKey());
                         }
-                        Log.wtf("Load data", "done");
+                        sensorList.get(index).setCurrentHis(hisIndex);
                     }
 
                     @Override
@@ -472,13 +505,14 @@ public class UserController {
                 });
 
             } else if (typ == 1) {
-                database.getReference("SpeakerHis").child(hash).child(deviceID).limitToLast(1).addValueEventListener(new ValueEventListener() {
+                database.getReference("SpeakerHis").child(hash).child(deviceID).child("time").limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        speakerList.get(index).setCurrentHis(0);
+                        int hisIndex = -1;
                         for (DataSnapshot post : snapshot.getChildren()) {
-                            speakerList.get(index).setCurrentHis(Integer.parseInt(post.getKey()) + 1);
+                            hisIndex = Integer.parseInt(post.getKey());
                         }
+                        speakerList.get(index).setCurrentHis(hisIndex);
                     }
 
                     @Override
@@ -509,16 +543,18 @@ public class UserController {
 
         public void getHistory(int typ, int amount) {
             if (typ == 0) {
-                Log.wtf("Load_data", "type = 0");
                 for (Sensor sensor : sensorList) {
-                    database.getReference("SensorHis").child(hash).child(sensor.getDeviceID()).limitToLast(amount).addValueEventListener(new ValueEventListener(){
+                    SensorHis history = new SensorHis(sensor.getDeviceID(), sensor.getName());
+                    database.getReference("SensorHis").child(hash).child(sensor.getDeviceID()).child("obstacle").limitToLast(amount).addValueEventListener(new ValueEventListener(){
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            sensorHisList = new ArrayList<SensorHis>();
+                            List<String> obstacle = new ArrayList<String>();
                             for (DataSnapshot post : snapshot.getChildren()) {
-                                sensorHisList.add(post.getValue(SensorHis.class));
+                                obstacle.add(post.getValue().toString());
+                                Log.e(sensor.getDeviceID(), post.getValue().toString());
                             }
-                            Log.wtf("Load_data", "size: " + sensorHisList.size());
+                            history.obstacle = obstacle;
+                            sensorHisList.add(history);
                         }
 
                         @Override
@@ -528,15 +564,18 @@ public class UserController {
                     });
                 }
 
-            } else if (typ == 1){
+            } else if (typ == 1) {
                 for (Speaker speaker : speakerList) {
-                    database.getReference("SpeakerHis").child(hash).child(speaker.getDeviceID()).limitToLast(amount).addValueEventListener(new ValueEventListener(){
+                    SpeakerHis history = new SpeakerHis(speaker.getDeviceID(), speaker.getName());
+                    database.getReference("SpeakerHis").child(hash).child(speaker.getDeviceID()).child("time").limitToLast(amount).addValueEventListener(new ValueEventListener(){
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            speakerHisList = new ArrayList<SpeakerHis>();
+                            List<String> time = new ArrayList<>();
                             for (DataSnapshot post : snapshot.getChildren()) {
-                                speakerHisList.add(post.getValue(SpeakerHis.class));
+                                time.add(post.getValue().toString());
                             }
+                            history.time = time;
+                            speakerHisList.add(history);
                         }
 
                         @Override

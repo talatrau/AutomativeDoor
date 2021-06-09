@@ -13,6 +13,15 @@ import java.time.LocalDateTime;
 public class Servo extends Component {
 
     ServoHis servoHis;
+    private boolean state;
+
+    public void setState(boolean state) {
+        this.state = state;
+    }
+
+    public boolean getState() {
+        return this.state;
+    }
 
     public void setServoHis(ServoHis his) {
         this.currentHis -= 1;

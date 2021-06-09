@@ -10,6 +10,7 @@
         android:id="@+id/component_txt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/trapezoid_shape"
         android:text="Component State"
         android:textColor="@color/white"
         android:textSize="20dp"
@@ -25,13 +26,44 @@
         android:layout_marginLeft="25sp"
         android:layout_marginRight="25sp">
 
-    <ListView
-        android:id="@+id/component_listview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerHorizontal="true" >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    </ListView>
+            <RelativeLayout
+                android:id="@+id/component_layout_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/component_on"
+                android:layout_marginTop="15sp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="MODE"
+                    android:paddingLeft="20sp"
+                    android:textSize="20sp"/>
+
+                <TextView
+                    android:id="@+id/component_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:paddingRight="20sp"
+                    android:text="ON"
+                    android:textSize="20sp"/>
+
+            </RelativeLayout>
+
+            <ListView
+                android:id="@+id/component_listview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"/>
+
+        </LinearLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -126,7 +158,7 @@
                 android:layout_gravity="center"
                 android:textColor="@color/black"
                 android:textSize="10sp"
-                android:text="Sensor"
+                android:text="Mode"
                 android:clickable="true" />
 
         </LinearLayout>

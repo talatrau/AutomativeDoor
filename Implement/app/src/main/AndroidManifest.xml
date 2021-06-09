@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <uses-feature android:name="android.hardware.usb.host" />
+
     <uses-permission android:name="android.permission.USB_PERMISSION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -26,8 +27,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
+        <activity android:name=".SetTimer"></activity>
 
-        <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+        <meta-data
+            android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
             android:resource="@xml/device_filter" />
 
         <activity
@@ -39,22 +42,39 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".forgot_pass" android:label="@string/forgot_pass" />
-        <activity android:name=".HomePage" android:label="@string/homepage" />
-        <activity android:name=".Component" android:label="@string/component" />
-        <activity android:name=".feedback" android:label="@string/response" />
-        <activity android:name=".History" android:label="@string/history" />
-        <activity android:name=".GeneralHistory" android:label="GeneralHistory" />
-        <activity android:name=".HistoryDetail" android:label="HistoryDetail" />
-        <activity android:name=".Sensor" android:label="@string/sensor" />
-        <activity android:name=".Servo" android:label="@string/servo" />
-        <activity android:name=".Speaker" android:label="@string/speaker" />
-        <activity android:name=".pin" android:label="@string/pin" />
-        <activity android:name=".PinCreate" android:label="@string/pincreate" />
+        <activity
+            android:name=".forgot_pass"
+            android:label="@string/forgot_pass" />
+        <activity
+            android:name=".HomePage"
+            android:label="@string/homepage" />
+        <activity
+            android:name=".Component"
+            android:label="@string/component" />
+        <activity
+            android:name=".feedback"
+            android:label="@string/response" />
+        <activity
+            android:name=".History"
+            android:label="@string/history" />
+        <activity
+            android:name=".GeneralHistory"
+            android:label="GeneralHistory" />
+        <activity
+            android:name=".HistoryDetail"
+            android:label="HistoryDetail" />
+        <activity
+            android:name=".pin"
+            android:label="@string/pin" />
+        <activity
+            android:name=".PinCreate"
+            android:label="@string/pincreate" />
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
-        <service android:name="com.example.automativedoor.Control.SensorService" android:enabled="true" android:exported="true" />
-
+        <service
+            android:name=".Control.SensorService"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

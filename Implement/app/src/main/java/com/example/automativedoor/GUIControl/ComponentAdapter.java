@@ -9,6 +9,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.automativedoor.EntityClass.Component;
+import com.example.automativedoor.EntityClass.Sensor;
+import com.example.automativedoor.EntityClass.Servo;
+import com.example.automativedoor.EntityClass.Speaker;
 import com.example.automativedoor.R;
 
 import java.util.List;
@@ -17,16 +20,20 @@ public class ComponentAdapter extends BaseAdapter {
     private Context context;
     private int layout;
     private List<Component> components;
+    private List<Servo> servos;
+    private List<Speaker> speakers;
 
-    public ComponentAdapter(Context context, int layout, List<Component> components) {
+    public ComponentAdapter(Context context, int layout, List<Component> components, List<Servo> servos, List<Speaker> speakers) {
         this.context = context;
         this.layout = layout;
         this.components = components;
+        this.servos = servos;
+        this.speakers = speakers;
     }
 
     @Override
     public int getCount() {
-        return components.size();
+        return this.components.size();
     }
 
     @Override
@@ -56,14 +63,25 @@ public class ComponentAdapter extends BaseAdapter {
             holder = (ComponentAdapter.ViewHolder) convertView.getTag();
         }
 
-        Component component = components.get(position);
-        holder.txtName.setText(component.getName());
-        if (component.getState()) {
-            holder.txtState.setText("ON");
+        int speaker_index = 0;
+        int servo_index = speakers.size() + speaker_index;
+
+        if (position < servo_index) {
+            Speaker speaker = speakers.get(position - speaker_index);
+            holder.txtName.setText(speaker.getName());
+            holder.txtState.setText(String.valueOf(speaker.getVolume()));
             holder.relativeLayout.setBackgroundResource(R.drawable.component_on);
-        } else {
-            holder.txtState.setText("OFF");
-            holder.relativeLayout.setBackgroundResource(R.drawable.component_off);
+        }
+        else {
+            Servo servo = servos.get(position - servo_index);
+            holder.txtName.setText(servo.getName());
+            if (servo.getState()) {
+                holder.txtState.setText("ON");
+                holder.relativeLayout.setBackgroundResource(R.drawable.component_on);
+            } else {
+                holder.txtState.setText("OFF");
+                holder.relativeLayout.setBackgroundResource(R.drawable.component_off);
+            }
         }
 
         return convertView;
