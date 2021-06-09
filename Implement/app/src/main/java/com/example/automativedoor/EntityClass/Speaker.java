@@ -9,6 +9,7 @@ import com.example.automativedoor.Control.UserController;
 import com.google.firebase.database.DatabaseReference;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Speaker extends Component {
 
@@ -54,18 +55,13 @@ public class Speaker extends Component {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void saveHistory() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String date = formatter.format(LocalDateTime.now());
         this.currentHis += 1;
-        if (this.currentHis == 0) {
-            database.getReference("SpeakerHis").child(UserController.getInstance()
-                    .getHash()).child(this.deviceID).child("deviceID").setValue(this.deviceID);
-            database.getReference("SpeakerHis").child(UserController.getInstance()
-                    .getHash()).child(this.deviceID).child("name").setValue(this.name);
-        }
-
 
         String time = LocalDateTime.now().toString().substring(0, 19);
-        database.getReference("SpeakerHis").child(UserController.getInstance()
-                .getHash()).child(this.deviceID).child("time").child(String.valueOf(this.currentHis)).setValue(time);
+        database.getReference("SpeakerHis").child(UserController.getInstance().getHash()).child(this.deviceID)
+                .child("time").child(date).child(String.valueOf(this.currentHis)).setValue(time);
     }
 
     @Override

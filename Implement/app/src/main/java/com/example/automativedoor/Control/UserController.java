@@ -45,6 +45,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -176,6 +177,7 @@ public class UserController {
     public boolean openDoor() {
         Log.e("open the door", "message");
         if (this.servoList.get(0).toggle(true)) {
+            loadHistory(2, "2021-06-09");
             closeDoorCount.cancel();
             String topic = "CongTuVu/feeds/automativedoor.servo";
             this.mqttServer_2.publishMqtt("{\n" +
@@ -323,11 +325,11 @@ public class UserController {
 
     }
 
-    public void loadHistory(int typ, int amount) {
+    public void loadHistory(int typ, String date) {
         // typ = 0: sensor 1: speaker 2: servo
         // amount of doccument
-        Log.wtf("Load_data", "loadHistory ran");
-        driver.getHistory(typ, amount);
+        // date format yyyy-MM-dd
+        driver.getHistory(typ, date);
     }
 
     public DatabaseReference setup() {
@@ -410,6 +412,7 @@ public class UserController {
         public void readComponent() {
             ref = database.getReference("Component").child(hash);
             ref.child("Sensor").addValueEventListener(new ValueEventListener() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     sensorList = new ArrayList<Sensor>();
@@ -430,6 +433,7 @@ public class UserController {
             });
 
             ref.child("Speaker").addValueEventListener(new ValueEventListener() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     speakerList = new ArrayList<Speaker>();
@@ -450,6 +454,7 @@ public class UserController {
             });
 
             ref.child("Servo").addValueEventListener(new ValueEventListener() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     servoList = new ArrayList<Servo>();
@@ -486,9 +491,12 @@ public class UserController {
             return ref;
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         public void getCurrentHis(int typ, String deviceID, int index) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String date = formatter.format(LocalDateTime.now());
             if (typ == 0) {
-                database.getReference("SensorHis").child(hash).child(deviceID).child("obstacle").limitToLast(1).addValueEventListener(new ValueEventListener() {
+                database.getReference("SensorHis").child(hash).child(deviceID).child("obstacle").child(date).limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         int hisIndex = -1;
@@ -505,7 +513,7 @@ public class UserController {
                 });
 
             } else if (typ == 1) {
-                database.getReference("SpeakerHis").child(hash).child(deviceID).child("time").limitToLast(1).addValueEventListener(new ValueEventListener() {
+                database.getReference("SpeakerHis").child(hash).child(deviceID).child("time").child(date).limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         int hisIndex = -1;
@@ -522,14 +530,14 @@ public class UserController {
                 });
 
             } else if (typ == 2) {
-                database.getReference("ServoHis").child(hash).child(deviceID).limitToLast(1).addValueEventListener(new ValueEventListener() {
+                database.getReference("ServoHis").child(hash).child(deviceID).child("time").child(date).limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        servoList.get(index).setCurrentHis(-1);
+                        int hisIndex = - 1;
                         for (DataSnapshot post : snapshot.getChildren()) {
-                            servoList.get(index).setCurrentHis(Integer.parseInt(post.getKey()) + 1);
-                            servoList.get(index).setServoHis(post.getValue(ServoHis.class));
+                            hisIndex = Integer.parseInt(post.getKey());
                         }
+                        servoList.get(index).setCurrentHis(hisIndex);
                     }
 
                     @Override
@@ -541,11 +549,11 @@ public class UserController {
             }
         }
 
-        public void getHistory(int typ, int amount) {
+        public void getHistory(int typ, String date) {
             if (typ == 0) {
                 for (Sensor sensor : sensorList) {
                     SensorHis history = new SensorHis(sensor.getDeviceID(), sensor.getName());
-                    database.getReference("SensorHis").child(hash).child(sensor.getDeviceID()).child("obstacle").limitToLast(amount).addValueEventListener(new ValueEventListener(){
+                    database.getReference("SensorHis").child(hash).child(sensor.getDeviceID()).child("obstacle").child(date).addValueEventListener(new ValueEventListener(){
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             List<String> obstacle = new ArrayList<String>();
@@ -567,7 +575,7 @@ public class UserController {
             } else if (typ == 1) {
                 for (Speaker speaker : speakerList) {
                     SpeakerHis history = new SpeakerHis(speaker.getDeviceID(), speaker.getName());
-                    database.getReference("SpeakerHis").child(hash).child(speaker.getDeviceID()).child("time").limitToLast(amount).addValueEventListener(new ValueEventListener(){
+                    database.getReference("SpeakerHis").child(hash).child(speaker.getDeviceID()).child("time").child(date).addValueEventListener(new ValueEventListener(){
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             List<String> time = new ArrayList<>();
@@ -586,13 +594,16 @@ public class UserController {
                 }
             } else if (typ == 2) {
                 for (Servo servo : servoList) {
-                    database.getReference("ServoHis").child(hash).child(servo.getDeviceID()).limitToLast(amount).addValueEventListener(new ValueEventListener(){
+                    ServoHis servoHis = new ServoHis(servo.getDeviceID(), servo.getName());
+                    database.getReference("ServoHis").child(hash).child(servo.getDeviceID()).child("time").child(date).addValueEventListener(new ValueEventListener(){
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            servoHisList = new ArrayList<ServoHis>();
                             for (DataSnapshot post : snapshot.getChildren()) {
-                                servoHisList.add(post.getValue(ServoHis.class));
+                                String oTime = post.child("oTime").getValue().toString();
+                                String cTime = post.child("cTime").getValue() != null ? post.child("cTime").getValue().toString() : null;
+                                servoHis.setTime(oTime, cTime);
                             }
+                            servoHisList.add(servoHis);
                         }
 
                         @Override

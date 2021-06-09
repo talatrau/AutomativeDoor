@@ -81,7 +81,7 @@ public class HistAdapter extends BaseAdapter {
         if (type == 0)
             times = getData(listSensorHis.get(position));
         else if (type == 2)
-            times = getData(listServoHis.get(position));
+//            times = getData(listServoHis.get(position));
 
         if (times.size() == 1){
             if (type != 1)
@@ -101,13 +101,13 @@ public class HistAdapter extends BaseAdapter {
 //            ret.add(history.eTime);
         return ret;
     }
-    private List<String> getData(ServoHis history){
-        List<String> ret = new ArrayList<>();
-        ret.add(history.oTime);
-        if (history.cTime != "")
-            ret.add(history.cTime);
-        return ret;
-    }
+//    private List<String> getData(ServoHis history){
+//        List<String> ret = new ArrayList<>();
+//        ret.add(history.oTime);
+//        if (history.cTime != "")
+//            ret.add(history.cTime);
+//        return ret;
+//    }
 
     private View oneLine(View convertView, String sTime){
         TextView date = convertView.findViewById(R.id.date);

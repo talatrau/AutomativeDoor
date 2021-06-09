@@ -13,6 +13,7 @@ import com.example.automativedoor.Control.UserController;
 import com.google.firebase.database.DatabaseReference;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class Sensor extends Component {
@@ -58,18 +59,13 @@ public class Sensor extends Component {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void saveHistory() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String date = formatter.format(LocalDateTime.now());
         this.currentHis += 1;
-        if (this.currentHis == 0) {
-            database.getReference("SensorHis").child(UserController.getInstance()
-                    .getHash()).child(this.deviceID).child("deviceID").setValue(this.deviceID);
-            database.getReference("SensorHis").child(UserController.getInstance()
-                    .getHash()).child(this.deviceID).child("name").setValue(this.name);
-        }
 
-
-        String time = LocalDateTime.now().toString().substring(0, 19);
-        database.getReference("SensorHis").child(UserController.getInstance()
-                .getHash()).child(this.deviceID).child("obstacle").child(String.valueOf(this.currentHis)).setValue(time);
+        String time = LocalDateTime.now().toString().substring(0, 19) + " " + UserController.getInstance().getMode();
+        database.getReference("SensorHis").child(UserController.getInstance().getHash()).child(this.deviceID)
+                .child("obstacle").child(date).child(String.valueOf(this.currentHis)).setValue(time);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

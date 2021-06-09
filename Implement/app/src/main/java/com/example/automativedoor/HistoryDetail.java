@@ -22,7 +22,7 @@ public class HistoryDetail extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.history_detail_activity);
-        UserController.getInstance().loadHistory(0, 4);
+//        UserController.getInstance().loadHistory(0, 4);
 
         histories = UserController.getInstance().sensorHisList;
         HistAdapter histAdapter = new HistAdapter(HistoryDetail.this, R.layout.stream_tworound_history);

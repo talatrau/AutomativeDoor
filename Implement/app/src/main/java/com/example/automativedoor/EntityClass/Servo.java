@@ -9,10 +9,10 @@ import com.example.automativedoor.Control.UserController;
 import com.google.firebase.database.DatabaseReference;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Servo extends Component {
 
-    ServoHis servoHis;
     private boolean state;
 
     public void setState(boolean state) {
@@ -23,11 +23,6 @@ public class Servo extends Component {
         return this.state;
     }
 
-    public void setServoHis(ServoHis his) {
-        this.currentHis -= 1;
-        this.servoHis = his;
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     public boolean toggle(boolean signal) {
         if (this.state == signal) {
@@ -36,7 +31,7 @@ public class Servo extends Component {
             this.state = signal;
             DatabaseReference reference = database.getReference("Component").child(UserController.getInstance().getHash()).child("Servo");
             reference.child(this.currentIndex).setValue(this);
-            this.genHistory();
+            this.saveHistory();
             return true;
         }
     }
@@ -48,26 +43,24 @@ public class Servo extends Component {
         reference.child(this.currentIndex).child("name").setValue(name);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void saveHistory() {
-        DatabaseReference reference = database.getReference("ServoHis").child(UserController.getInstance().getHash()).child(this.deviceID).child(String.valueOf(this.currentHis));
-        reference.setValue(this.servoHis);
-    }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String date = formatter.format(LocalDateTime.now());
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void genHistory() {
         if (this.state) {
             this.currentHis += 1;
-            this.servoHis = new ServoHis();
-            servoHis.deviceID = this.deviceID;
-            servoHis.name = this.name;
-            servoHis.oTime = LocalDateTime.now().toString().substring(0, 19);
-            this.saveHistory();
-        } else {
-            this.servoHis.cTime = LocalDateTime.now().toString().substring(0, 19);
-            this.saveHistory();
-            this.servoHis = null;
-        }
 
+            String oTime = LocalDateTime.now().toString().substring(0, 19) + " " + UserController.getInstance().getMode();
+            database.getReference("ServoHis").child(UserController.getInstance().getHash())
+                    .child(this.deviceID).child("time").child(date).child(String.valueOf(this.currentHis)).child("oTime").setValue(oTime);
+        }
+        else {
+            String cTime = LocalDateTime.now().toString().substring(0, 19) + " " + UserController.getInstance().getMode();
+            database.getReference("ServoHis").child(UserController.getInstance().getHash())
+                    .child(this.deviceID).child("time").child(date).child(String.valueOf(this.currentHis)).child("cTime").setValue(cTime);
+        }
     }
+
 }
