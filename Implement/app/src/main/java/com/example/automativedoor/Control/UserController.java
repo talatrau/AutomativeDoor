@@ -93,6 +93,7 @@ public class UserController {
     public ArrayList<Sensor> sensorList;
     public ArrayList<Speaker> speakerList;
     public ArrayList<Servo> servoList;
+    public int currentHisType; // 0: sensor 1: speaker 2: servo
 
     private UserController() {
         driver = new DatabaseDriver();
