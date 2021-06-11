@@ -3,12 +3,17 @@ package com.example.automativedoor;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -16,11 +21,14 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.example.automativedoor.Control.ScheduleReceiver;
+import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.GUIControl.TimerAdapter;
 
 import org.json.JSONArray;
@@ -36,6 +44,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.Buffer;
+import java.util.Arrays;
+import java.util.Calendar;
 
 
 public class SetTimer extends AppCompatActivity {
@@ -45,19 +55,17 @@ public class SetTimer extends AppCompatActivity {
     TextView txt_save, txt_cancel;
     Switch aSwitch;
 
-    private int index;
     private boolean[] dayOfWeek = {false, false, false, false, false, false, false};
     private boolean action = false;
     private int timerMin;
     private int timerHour;
     private JSONArray jsonArray = null;
-    private JSONObject jsonTimer = null;
-    private TimerAdapter adapter;
-    private SwipeMenuListView listView;
+    final private UserController controller = UserController.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_set_timer);
 
         timePicker = (TimePicker) findViewById(R.id.setTimer_timer);
@@ -68,13 +76,10 @@ public class SetTimer extends AppCompatActivity {
         txt_save = (TextView) findViewById(R.id.settimer_save);
         txt_cancel = (TextView) findViewById(R.id.setTimer_cancel);
         aSwitch = (Switch) findViewById(R.id.setTimer_action_val);
-        listView = (SwipeMenuListView) findViewById(R.id.setTimer_listview);
 
         timePicker.setIs24HourView(true);
         this.timerMin = timePicker.getMinute();
         this.timerHour = timePicker.getHour();
-
-        this.index = 0;
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
@@ -88,55 +93,9 @@ public class SetTimer extends AppCompatActivity {
             }
         };
 
-        listView.setMenuCreator(creator);
+        this.jsonArray = controller.readJson("timer.json");
 
         this.setEvent();
-        this.parseJson();
-        this.associate();
-    }
-
-    private void associate() {
-        JSONArray adapterElement;
-        try {
-            adapterElement = jsonTimer.getJSONArray("timer");
-        } catch (Exception e) {
-            adapterElement = new JSONArray();
-        }
-        adapter = new TimerAdapter(this, R.layout.stream_set_timer, adapterElement);
-        listView.setAdapter(adapter);
-    }
-
-    private void parseJson() {
-        String json = null;
-        try {
-            InputStream inputStream = openFileInput("timer.json");
-            int size = inputStream.available();
-            byte[] data = new byte[size];
-            inputStream.read(data);
-            inputStream.close();
-            json = new String(data);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Log.e("json", json);
-        try {
-            this.jsonArray = new JSONArray(json);
-            int len = this.jsonArray.length();
-            for (int i = 0; i < len; i++) {
-                JSONObject jsonObject = this.jsonArray.getJSONObject(i);
-                int index = (int) jsonObject.get("index");
-                if (index == this.index) {
-                    this.jsonTimer = jsonObject;
-                    this.jsonArray.remove(i);
-                    break;
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            this.jsonArray = new JSONArray();
-        }
     }
 
     private void setEvent() {
@@ -159,28 +118,20 @@ public class SetTimer extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    FileOutputStream outputStream = openFileOutput("timer.json", MODE_PRIVATE);
-                    JSONArray timerArray;
-                    if (jsonTimer == null) {
-                        jsonTimer = new JSONObject();
-                        jsonTimer.put("index", index);
-                        timerArray = new JSONArray();
-                    }
-                    else {
-                        timerArray = jsonTimer.getJSONArray("timer");
-                    }
-                    timerArray.put(getCurrentTimer());
-                    jsonTimer.put("timer", timerArray);
-                    jsonArray.put(jsonTimer);
-                    outputStream.write(jsonArray.toString().getBytes());
-                    outputStream.close();
+                    JSONObject object = getCurrentTimer();
+                    int index = (int) (System.currentTimeMillis() % 1000000000);
+                    object.put("index", index);
+                    jsonArray.put(object);
+                    controller.writeJson(jsonArray, "timer.json");
 
-                    associate();
+                    int hour = object.getInt("hour");
+                    int min = object.getInt("minute");
+                    int mode = object.getInt("mode");
+                    String dow = object.getString("dow");
 
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    schedule(dow, mode, hour, min, index);
+                    Toast.makeText(SetTimer.this, "Save Success!", Toast.LENGTH_LONG).show();
+                    finish();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -191,62 +142,18 @@ public class SetTimer extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 action = isChecked;
-            }
-        });
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                try {
-                    JSONArray array = jsonTimer.getJSONArray("timer");
-                    JSONObject object = array.getJSONObject(position);
-
-                    String dow = object.getString("dow");
-                    boolean[] dayofweek = {false, false, false, false, false, false, false};
-                    for (int i = 0; i < 7; i++) {
-                        if (dow.charAt(i) == '1') dayofweek[i] = true;
-                    }
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                    builder.setTitle("Repeat every");
-                    String[] items = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-                    builder.setMultiChoiceItems(items, dayofweek, new DialogInterface.OnMultiChoiceClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-
-                        }
-                    });
-                    builder.setPositiveButton("Confirm", null);
-
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.getListView().setEnabled(false);
-                    alertDialog.show();
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if (isChecked) {
+                    TextView textView = findViewById(R.id.setTimer_mode);
+                    textView.setText("Anti Thief");
+                    textView.setTextColor(Color.parseColor("#FFD50000"));
+                    aSwitch.setBackgroundResource(R.color.red);
                 }
-            }
-        });
-
-        listView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-                try {
-                    JSONArray array = jsonTimer.getJSONArray("timer");
-                    array.remove(position);
-                    jsonTimer.put("timer", array);
-                    FileOutputStream outputStream = openFileOutput("timer.json", MODE_PRIVATE);
-                    jsonArray.put(jsonTimer);
-                    outputStream.write(jsonArray.toString().getBytes());
-                    outputStream.close();
-                    associate();
-                } catch (JSONException | FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                else {
+                    TextView textView = findViewById(R.id.setTimer_mode);
+                    textView.setText("Welcome Guest");
+                    textView.setTextColor(Color.parseColor("#FF00E676"));
+                    aSwitch.setBackgroundResource(R.color.green);
                 }
-
-                return true;
             }
         });
 
@@ -259,19 +166,52 @@ public class SetTimer extends AppCompatActivity {
             dow += dayOfWeek[i] ? "1" : "0";
             dayOfWeek[i] = false;
         }
-        String act = action ? "ON" : "OFF";
+        int act = action ? 2 : 1;
         aSwitch.setChecked(false);
         String label = txt_label_val.getText().toString();
         label = label.substring(0, label.length() - 2);
-        txt_label_val.setText("None");
+        txt_label_val.setText("None >");
+        txt_repeat_val.setText("no repeat >");
 
         JSONObject timer = new JSONObject();
         timer.put("hour", timerHour);
         timer.put("minute", timerMin);
         timer.put("dow", dow);
-        timer.put("action", act);
+        timer.put("mode", act);
         timer.put("label", label);
+
         return timer;
+    }
+
+    public void schedule(String dow, int mode, int hour, int min, int index) {
+        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, min);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        long timeInMillis = calendar.getTimeInMillis();
+        if (timeInMillis < System.currentTimeMillis()) {
+            timeInMillis += AlarmManager.INTERVAL_DAY;
+        }
+
+        if (dow.equals("0000000")) {
+            Intent intent = new Intent(getApplicationContext(), ScheduleReceiver.class);
+            intent.putExtra("MODE", mode);
+            intent.putExtra("DEL", 1);
+            intent.putExtra("INDEX", index);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), index, intent, 0);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent);
+        }
+        else {
+            Intent intent = new Intent(getApplicationContext(), ScheduleReceiver.class);
+            intent.putExtra("MODE", mode);
+            intent.putExtra("DOW", dow);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), index, intent, 0);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timeInMillis, 24 * 60 * 60 * 1000, pendingIntent);
+        }
     }
 
     public void repeatClick(View view) {
@@ -288,16 +228,27 @@ public class SetTimer extends AppCompatActivity {
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                boolean[] nocheck = {false, false, false, false, false, false, false};
+                boolean[] checkall = {true, true, true, true, true, true, true};
                 dayOfWeek = seleted;
-                String str = "";
-                if (dayOfWeek[0]) str += ",Sun";
-                if (dayOfWeek[1]) str += ",Mon";
-                if (dayOfWeek[2]) str += ",Tue";
-                if (dayOfWeek[3]) str += ",Wed";
-                if (dayOfWeek[4]) str += ",Thu";
-                if (dayOfWeek[5]) str += ",Fri";
-                if (dayOfWeek[6]) str += ",Sat";
-                txt_repeat_val.setText(str.substring(1) + " >");
+
+                if (Arrays.equals(seleted, nocheck)) {
+                    txt_repeat_val.setText("no repeat >");
+                }
+                else if (Arrays.equals(seleted, checkall)) {
+                    txt_repeat_val.setText("every day >");
+                }
+                else {
+                    String str = "";
+                    if (dayOfWeek[0]) str += ",Sun";
+                    if (dayOfWeek[1]) str += ",Mon";
+                    if (dayOfWeek[2]) str += ",Tue";
+                    if (dayOfWeek[3]) str += ",Wed";
+                    if (dayOfWeek[4]) str += ",Thu";
+                    if (dayOfWeek[5]) str += ",Fri";
+                    if (dayOfWeek[6]) str += ",Sat";
+                    txt_repeat_val.setText(str.substring(1) + " >");
+                }
             }
         });
         builder.setNegativeButton("Cancel", null);

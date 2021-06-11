@@ -80,18 +80,6 @@ public class forgot_pass extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 UserController.getInstance().forgotPass(email.getText().toString(), pin.getText().toString());
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(forgot_pass.this);
-                builder.setMessage("Password had been send to your EMAIL. \n \nIf not please check your EMAIL or PIN.");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-
                 email.setText("");
                 pin.setText("");
             }

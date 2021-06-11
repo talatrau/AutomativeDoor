@@ -38,7 +38,7 @@ public class MQTTServer {
 
             @Override
             public void connectionLost(Throwable cause) {
-                Log.w("Lost mqtt", cause.toString());
+                Log.w("Lost mqtt", "connection");
             }
 
             @Override

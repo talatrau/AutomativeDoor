@@ -26,7 +26,8 @@ public class HomePage extends AppCompatActivity {
     private UserController controller = UserController.getInstance();
 
     private void componentClick() {
-        startActivity(new Intent(this, Component.class));
+        Intent intent = new Intent(this, pin.class);
+        startActivityForResult(intent, 1);
     }
 
     private void historyClick() {
@@ -34,7 +35,8 @@ public class HomePage extends AppCompatActivity {
     }
 
     private void responseClick() {
-        startActivityForResult(new Intent(this, feedback.class), 0);
+        Intent intent = new Intent(this, feedback.class);
+        startActivityForResult(intent, 0);
     }
 
     private CountDownTimer countDownTimer;
@@ -115,18 +117,6 @@ public class HomePage extends AppCompatActivity {
             }
         });
 
-        countDownTimer = new CountDownTimer(30000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-
-            }
-
-            @Override
-            public void onFinish() {
-                response_bnt.setEnabled(true);
-                response_txt.setEnabled(true);
-            }
-        };
     }
 
     @Override
@@ -177,14 +167,50 @@ public class HomePage extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 0)  {
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-                Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
-            }
-            else if (resultCode == AppCompatActivity.RESULT_CANCELED) {
+            if (resultCode == AppCompatActivity.RESULT_CANCELED) {
                 Toast.makeText(this, "SPAM", Toast.LENGTH_SHORT).show();
                 response_bnt.setEnabled(false);
                 response_txt.setEnabled(false);
+                countDownTimer = new CountDownTimer(30000, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        response_bnt.setEnabled(true);
+                        response_txt.setEnabled(true);
+                    }
+                };
                 countDownTimer.start();
+            }
+        }
+        else if (requestCode == 1) {
+            if (resultCode == AppCompatActivity.RESULT_OK) {
+                final String result = data.getStringExtra(pin.PIN_RESULT);
+                if (result.equals("pin correct")) startActivity(new Intent(this, Component.class));
+                else {
+                    String content = "Ai do dang co gang truy cap vao thiet bi cua ban!!! <br> Hay co chinh sach bao ve ma PIN va tai khoan cua ban. <br>";
+                    content += "<h1>Smart Home App</h1>" +
+                            "<img src=\"https://img.docbao.vn/images/uploads/2019/11/11/xa-hoi/smart-home.jpg\" width=\"1000\" height=\"600\">";
+                    controller.sendMail("Invalid Access", content);
+                    component_bnt.setEnabled(false);
+                    component_txt.setEnabled(false);
+                    countDownTimer = new CountDownTimer(30000, 1000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            component_bnt.setEnabled(true);
+                            component_txt.setEnabled(true);
+                        }
+                    };
+                    countDownTimer.start();
+                }
             }
         }
     }

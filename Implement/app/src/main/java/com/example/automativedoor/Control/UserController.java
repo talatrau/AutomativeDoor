@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -22,7 +23,9 @@ import com.example.automativedoor.EntityClass.ServoHis;
 import com.example.automativedoor.EntityClass.Speaker;
 import com.example.automativedoor.EntityClass.SpeakerHis;
 import com.example.automativedoor.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,25 +34,33 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import com.google.firebase.database.ValueEventListener;
 
-import org.eclipse.paho.android.service.MqttService;
+
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -82,9 +93,9 @@ public class UserController {
         }
     };
 
-    public List<SensorHis> sensorHisList;
-    public List<ServoHis> servoHisList;
-    public List<SpeakerHis> speakerHisList;
+    public List<SensorHis>[] sensorHisList;
+    public List<ServoHis>[] servoHisList;
+    public List<SpeakerHis>[] speakerHisList;
 
     final public FirebaseAuth fauth = FirebaseAuth.getInstance();
 
@@ -93,17 +104,15 @@ public class UserController {
     public ArrayList<Sensor> sensorList;
     public ArrayList<Speaker> speakerList;
     public ArrayList<Servo> servoList;
+    public CountDownLatch latch;
 
     private UserController() {
-        driver = new DatabaseDriver();
-        sensorHisList = new ArrayList<>();
-        servoHisList = new ArrayList<>();
-        speakerHisList = new ArrayList<>();
+        this.driver = new DatabaseDriver();
     }
 
     public static UserController getInstance() {
         if (instance == null) {
-            instance =  new UserController();
+            instance = new UserController();
             return instance;
         }
         return instance;
@@ -122,6 +131,7 @@ public class UserController {
                 this.mqttServer_3 = null;
                 this.mqttServer_2.mqttAndroidClient.disconnect();
                 this.mqttServer_2 = null;
+                this.context.stopService(new Intent(context, SensorService.class));
             } catch (MqttException e) {
                 e.printStackTrace();
             }
@@ -131,15 +141,15 @@ public class UserController {
     public void setMqttServer() {
         boolean flag = false;
         if (this.mqttServer_2 == null) {
-            this.mqttServer_2 = new MQTTServer(context, "MqttService1", "CongTuVu", "", "CongTuVu/feeds/automativedoor.sensorspeaker");
+            this.mqttServer_2 = new MQTTServer(context, "MqttService1", "CongTuVu", "aio_aaiG65CmXYKMzww6AYtJEfkO34pb", "CongTuVu/feeds/automativedoor.sensorspeaker");
             flag = true;
             this.trackingSensor(0);
         }
         if (this.mqttServer_1 == null) {
-            this.mqttServer_1 = new MQTTServer(context, "MqttService", "CongTuVu", "", "");
+            this.mqttServer_1 = new MQTTServer(context, "MqttService", "CongTuVu", "aio_aaiG65CmXYKMzww6AYtJEfkO34pb", "");
         }
         if (this.mqttServer_3 == null) {
-            this.mqttServer_3 = new MQTTServer(context, "MqttService2", "CongTuVu", "", "CongTuVu/feeds/automativedoor.sensorservo");
+            this.mqttServer_3 = new MQTTServer(context, "MqttService2", "CongTuVu", "aio_aaiG65CmXYKMzww6AYtJEfkO34pb", "CongTuVu/feeds/automativedoor.sensorservo");
             flag = true;
             this.trackingSensor(1);
         }
@@ -175,9 +185,7 @@ public class UserController {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public boolean openDoor() {
-        Log.e("open the door", "message");
         if (this.servoList.get(0).toggle(true)) {
-            loadHistory(2, "2021-06-09");
             closeDoorCount.cancel();
             String topic = "CongTuVu/feeds/automativedoor.servo";
             this.mqttServer_2.publishMqtt("{\n" +
@@ -194,7 +202,6 @@ public class UserController {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public boolean closeDoor() {
-        Log.e("close the door", "message");
         if (this.servoList.get(0).toggle(false)) {
             String topic = "CongTuVu/feeds/automativedoor.servo";
             this.mqttServer_2.publishMqtt("{\n" +
@@ -218,7 +225,7 @@ public class UserController {
 
                 @Override
                 public void connectionLost(Throwable cause) {
-                    Log.w("Lost mqtt 2", cause.toString());
+                    Log.w("Lost mqtt 2", "connection");
                 }
 
                 @RequiresApi(api = Build.VERSION_CODES.O)
@@ -249,7 +256,7 @@ public class UserController {
 
                 @Override
                 public void connectionLost(Throwable cause) {
-                    Log.w("Lost mqtt 3", cause.toString());
+                    Log.w("Lost mqtt 3", "connection");
                 }
 
                 @RequiresApi(api = Build.VERSION_CODES.O)
@@ -273,6 +280,23 @@ public class UserController {
             });
         }
 
+    }
+
+    public JSONArray readJson(String file) {
+        byte[] data = driver.readFile(file);
+        String json = new String(data);
+
+        try {
+            JSONArray result = new JSONArray(json);
+            return result;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return new JSONArray();
+        }
+    }
+
+    public void writeJson(JSONArray data, String file) {
+        driver.writeFile(data.toString().getBytes(), file);
     }
 
     public boolean sendResponse(int score, String text) {
@@ -315,22 +339,33 @@ public class UserController {
         return false;
     }
 
-    public void scheduleSensor(LocalDateTime time) {
 
+    public void loadHistory(int typ, String date, int num) {
+        if (typ == 0) {
+            sensorHisList = new ArrayList[num];
+        }
+        else if (typ == 1) {
+            speakerHisList = new ArrayList[num];
+        }
+        else if (typ == 2) {
+            servoHisList = new ArrayList[num];
+        }
+
+        Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void run() {
+                latch = new CountDownLatch(num);
+                LocalDate pivot = LocalDate.parse(date);
+                for (int i = 0; i < num; i++) {
+                    String oldDate = pivot.minusDays(i).toString();
+                    driver.getHistory(typ, oldDate, i);
+                }
+            }
+        });
     }
 
-    // must start a new thread in this method
-    // to always tracking real time to turn on or off sensor
-    public void trackingTime() {
-
-    }
-
-    public void loadHistory(int typ, String date) {
-        // typ = 0: sensor 1: speaker 2: servo
-        // amount of doccument
-        // date format yyyy-MM-dd
-        driver.getHistory(typ, date);
-    }
 
     public DatabaseReference setup() {
         this.hash = md5Hash(fauth.getCurrentUser().getEmail());
@@ -338,9 +373,11 @@ public class UserController {
         return driver.readUser();
     }
 
+
     public void updateUser() {
         driver.writeUser();
     }
+
 
     public void forgotPass(String email, String pin) {
         this.hash = md5Hash(email);
@@ -348,12 +385,15 @@ public class UserController {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
                 if (user != null && user.pinVerify(pin)) {
-                    String message = "Your password is <u>" + user.getPass() + "</u>. <br>" ;
-                    message += "<h1>Smart Home App</h1>" +
-                            "<img src=\"https://img.docbao.vn/images/uploads/2019/11/11/xa-hoi/smart-home.jpg\" width=\"1000\" height=\"600\">";
-                    sendMail("Forgot Pass", message);
-                    hash = null;
-                    user = null;
+                    FirebaseAuth.getInstance().sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Toast.makeText(context, "Check your email to reset password", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+                else {
+                    Toast.makeText(context, "Invalid email or PIN", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -496,122 +536,120 @@ public class UserController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String date = formatter.format(LocalDateTime.now());
             if (typ == 0) {
-                database.getReference("SensorHis").child(hash).child(deviceID).child("obstacle").child(date).limitToLast(1).addValueEventListener(new ValueEventListener() {
+                database.getReference("SensorHis").child(hash).child(deviceID).child("obstacle").child(date).limitToLast(1).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        int hisIndex = -1;
-                        for (DataSnapshot post : snapshot.getChildren()) {
-                            hisIndex = Integer.parseInt(post.getKey());
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DataSnapshot snapshot = task.getResult();
+                            int hisIndex = -1;
+                            for (DataSnapshot post : snapshot.getChildren()) {
+                                hisIndex = Integer.parseInt(post.getKey());
+                            }
+                            sensorList.get(index).setCurrentHis(hisIndex);
                         }
-                        sensorList.get(index).setCurrentHis(hisIndex);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e("some thing wrong with ", error.toString());
                     }
                 });
 
             } else if (typ == 1) {
-                database.getReference("SpeakerHis").child(hash).child(deviceID).child("time").child(date).limitToLast(1).addValueEventListener(new ValueEventListener() {
+                database.getReference("SpeakerHis").child(hash).child(deviceID).child("time").child(date).limitToLast(1).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        int hisIndex = -1;
-                        for (DataSnapshot post : snapshot.getChildren()) {
-                            hisIndex = Integer.parseInt(post.getKey());
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DataSnapshot snapshot = task.getResult();
+                            int hisIndex = -1;
+                            for (DataSnapshot post : snapshot.getChildren()) {
+                                hisIndex = Integer.parseInt(post.getKey());
+                            }
+                            speakerList.get(index).setCurrentHis(hisIndex);
                         }
-                        speakerList.get(index).setCurrentHis(hisIndex);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e("some thing wrong with ", error.toString());
                     }
                 });
 
             } else if (typ == 2) {
-                database.getReference("ServoHis").child(hash).child(deviceID).child("time").child(date).limitToLast(1).addValueEventListener(new ValueEventListener() {
+                database.getReference("ServoHis").child(hash).child(deviceID).child("time").child(date).limitToLast(1).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        int hisIndex = - 1;
-                        for (DataSnapshot post : snapshot.getChildren()) {
-                            hisIndex = Integer.parseInt(post.getKey());
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DataSnapshot snapshot = task.getResult();
+                            int hisIndex = -1;
+                            for (DataSnapshot post : snapshot.getChildren()) {
+                                hisIndex = Integer.parseInt(post.getKey());
+                            }
+                            servoList.get(index).setCurrentHis(hisIndex);
                         }
-                        servoList.get(index).setCurrentHis(hisIndex);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e("some thing wrong with ", error.toString());
                     }
                 });
-
             }
         }
 
-        public void getHistory(int typ, String date) {
-            if (typ == 0) {
+        public void getHistory(int typ, String date, int index) {
+            DatabaseReference reference;
+            if(typ == 0) {
+                sensorHisList[index] = new ArrayList<>();
                 for (Sensor sensor : sensorList) {
                     SensorHis history = new SensorHis(sensor.getDeviceID(), sensor.getName());
-                    database.getReference("SensorHis").child(hash).child(sensor.getDeviceID()).child("obstacle").child(date).addValueEventListener(new ValueEventListener(){
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            List<String> obstacle = new ArrayList<String>();
-                            for (DataSnapshot post : snapshot.getChildren()) {
-                                obstacle.add(post.getValue().toString());
-                                Log.e(sensor.getDeviceID(), post.getValue().toString());
-                            }
-                            history.obstacle = obstacle;
-                            sensorHisList.add(history);
-                        }
+                    reference = database.getReference("SensorHis").child(hash).child(sensor.getDeviceID()).child("obstacle").child(date);
 
+                    reference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                         @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            Log.e("some thing wrong with ", error.toString());
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                List<String> obstacle = new ArrayList<>();
+                                DataSnapshot snapshot = task.getResult();
+                                for (DataSnapshot post : snapshot.getChildren()) {
+                                    obstacle.add(post.getValue().toString());
+                                }
+                                history.obstacle = obstacle;
+                                sensorHisList[index].add(history);
+                            }
                         }
                     });
                 }
 
-            } else if (typ == 1) {
+            } else if(typ ==1) {
+                speakerHisList[index] = new ArrayList<>();
                 for (Speaker speaker : speakerList) {
                     SpeakerHis history = new SpeakerHis(speaker.getDeviceID(), speaker.getName());
-                    database.getReference("SpeakerHis").child(hash).child(speaker.getDeviceID()).child("time").child(date).addValueEventListener(new ValueEventListener(){
+                    reference = database.getReference("SpeakerHis").child(hash).child(speaker.getDeviceID()).child("time").child(date);
+                    reference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            List<String> time = new ArrayList<>();
-                            for (DataSnapshot post : snapshot.getChildren()) {
-                                time.add(post.getValue().toString());
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DataSnapshot snapshot = task.getResult();
+                                List<String> time = new ArrayList<>();
+                                for (DataSnapshot post : snapshot.getChildren()) {
+                                    time.add(post.getValue().toString());
+                                }
+                                history.time = time;
+                                speakerHisList[index].add(history);
                             }
-                            history.time = time;
-                            speakerHisList.add(history);
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            Log.e("some thing wrong with ", error.toString());
                         }
                     });
                 }
-            } else if (typ == 2) {
+
+            } else if(typ == 2) {
+                servoHisList[index] = new ArrayList<>();
                 for (Servo servo : servoList) {
                     ServoHis servoHis = new ServoHis(servo.getDeviceID(), servo.getName());
-                    database.getReference("ServoHis").child(hash).child(servo.getDeviceID()).child("time").child(date).addValueEventListener(new ValueEventListener(){
+                    reference = database.getReference("ServoHis").child(hash).child(servo.getDeviceID()).child("time").child(date);
+                    reference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            for (DataSnapshot post : snapshot.getChildren()) {
-                                String oTime = post.child("oTime").getValue().toString();
-                                String cTime = post.child("cTime").getValue() != null ? post.child("cTime").getValue().toString() : null;
-                                servoHis.setTime(oTime, cTime);
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DataSnapshot snapshot = task.getResult();
+                                for (DataSnapshot post : snapshot.getChildren()) {
+                                    String oTime = post.child("oTime").getValue().toString();
+                                    String cTime = post.child("cTime").getValue() != null ? post.child("cTime").getValue().toString() : null;
+                                    servoHis.setTime(oTime, cTime);
+                                    Log.e("oTime", oTime);
+                                }
+                                servoHisList[index].add(servoHis);
                             }
-                            servoHisList.add(servoHis);
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            Log.e("some thing wrong with ", error.toString());
+                            latch.countDown();
                         }
                     });
                 }
+                Log.e("in", "task");
             }
         }
 
@@ -624,6 +662,35 @@ public class UserController {
             ref = database.getReference("User").child(hash);
             ref.child("pin").setValue(user.getPin());
         }
+
+        public byte[] readFile(String file) {
+            try {
+                InputStream inputStream = context.openFileInput(file);
+                int size = inputStream.available();
+                byte[] data = new byte[size];
+                inputStream.read(data);
+                inputStream.close();
+                return data;
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        public void writeFile(byte[] data, String file) {
+            try {
+                FileOutputStream outputStream = context.openFileOutput(file, Context.MODE_PRIVATE);
+                outputStream.write(data);
+                outputStream.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     class SendMail extends AsyncTask<Void, Void, String> {
@@ -650,5 +717,4 @@ public class UserController {
             super.onPostExecute(s);
         }
     }
-
 }

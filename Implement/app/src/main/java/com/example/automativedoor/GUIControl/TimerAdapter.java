@@ -51,7 +51,7 @@ public class TimerAdapter extends BaseAdapter {
 
             holder.txt_time = (TextView) convertView.findViewById(R.id.timer_time);
             holder.txt_label = (TextView) convertView.findViewById(R.id.timer_label);
-            holder.txt_action = (TextView) convertView.findViewById(R.id.timer_action);
+            holder.txt_action = (TextView) convertView.findViewById(R.id.timer_mode_val);
             convertView.setTag(holder);
         } else {
             holder = (TimerAdapter.ViewHolder) convertView.getTag();
@@ -64,11 +64,11 @@ public class TimerAdapter extends BaseAdapter {
             String hour_time = hour < 10 ? "0" + hour : String.valueOf(hour);
             String min_time = min < 10 ? "0" + min : String.valueOf(min);
             String label = object.get("label").toString();
-            String action = object.get("action").toString();
+            String action = object.getInt("mode") == 1 ? "Welcome Guest" : "Anti Thief";
 
             holder.txt_time.setText(hour_time + ":" + min_time);
             holder.txt_label.setText(label);
-            holder.txt_action.setText("Action: " + action);
+            holder.txt_action.setText(action);
 
         } catch (JSONException e) {
             e.printStackTrace();

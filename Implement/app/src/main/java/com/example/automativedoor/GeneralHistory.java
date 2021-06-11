@@ -26,7 +26,7 @@ public class GeneralHistory extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.working_history_activity);
 
-        UserController.getInstance().loadHistory(0, "");
+        //UserController.getInstance().loadHistory(0, "");
 
         calendar = (CalendarView) findViewById(R.id.calendarHistory);
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {

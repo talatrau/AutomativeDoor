@@ -47,7 +47,7 @@ public class feedback extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        setResult(AppCompatActivity.RESULT_CANCELED);
+        setResult(AppCompatActivity.RESULT_OK);
         super.onBackPressed();
     }
 

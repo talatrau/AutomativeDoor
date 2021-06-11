@@ -24,12 +24,12 @@ public class HistoryDetail extends AppCompatActivity {
         setContentView(R.layout.history_detail_activity);
 //        UserController.getInstance().loadHistory(0, 4);
 
-        histories = UserController.getInstance().sensorHisList;
-        HistAdapter histAdapter = new HistAdapter(HistoryDetail.this, R.layout.stream_tworound_history);
-        histAdapter.setListSensorHis(histories);
-
-        listView = findViewById(R.id.listHistory);
-        listView.setAdapter(histAdapter);
+//        histories = UserController.getInstance().sensorHisList;
+//        HistAdapter histAdapter = new HistAdapter(HistoryDetail.this, R.layout.stream_tworound_history);
+//        histAdapter.setListSensorHis(histories);
+//
+//        listView = findViewById(R.id.listHistory);
+//        listView.setAdapter(histAdapter);
     }
 //    protected List<SensorHis> getSensorHist(){
 //        List<SensorHis> sensorHises = new ArrayList<>();

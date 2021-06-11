@@ -43,7 +43,7 @@ public class Sensor extends Component {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void toggle(int mode) {
-        this.setMode(mode);
+        this.mode = mode;
         database.getReference("Component").child(UserController.getInstance().getHash()).child("Sensor")
                 .child(this.currentIndex).child("mode").setValue(mode);
     }

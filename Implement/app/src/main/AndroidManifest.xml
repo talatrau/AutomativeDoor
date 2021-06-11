@@ -27,7 +27,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity android:name=".SetTimer"></activity>
 
         <meta-data
             android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
@@ -42,6 +41,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".SetTimer" />
+
+        <activity
+            android:name=".SpeakerView"
+            android:theme="@style/DialogActivity" />
+
+        <activity android:name=".ServoView"
+            android:theme="@style/DialogActivity" />
+
         <activity
             android:name=".forgot_pass"
             android:label="@string/forgot_pass" />
@@ -75,6 +85,8 @@
             android:name=".Control.SensorService"
             android:enabled="true"
             android:exported="true" />
+
+        <receiver android:name=".Control.ScheduleReceiver" />
     </application>
 
 </manifest>

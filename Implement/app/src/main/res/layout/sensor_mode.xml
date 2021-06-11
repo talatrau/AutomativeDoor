@@ -15,7 +15,7 @@
             android:checkedButton="@+id/sensor_mode"
             android:id="@+id/toggle"
             android:layout_width="0dp"
-            android:layout_height="30dp"
+            android:layout_height="50dp"
             android:layout_weight="7"
             android:background="@drawable/pink_out_line"
             android:orientation="horizontal"
@@ -35,6 +35,7 @@
                 android:button="@null"
                 android:gravity="center"
                 android:text="Welcome Guest"
+                android:textSize="15dp"
                 android:textColor="@color/white" />
 
             <RadioButton
@@ -49,15 +50,20 @@
                 android:button="@null"
                 android:gravity="center"
                 android:text="Anti Thief"
+                android:textSize="15dp"
                 android:textColor="@color/white" />
         </RadioGroup>
 
         <ImageView
             android:id="@+id/sensor_reminder"
             android:layout_width="0dp"
-            android:layout_height="30dp"
+            android:layout_height="50dp"
             android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
             android:src="@drawable/sensor_timer"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"/>
 
@@ -70,6 +76,7 @@
         android:text="Ok"
         android:gravity="center"
         android:layout_gravity="center"
-        android:background="@color/blue_grey" />
+        android:background="@color/blue_grey"
+        android:layout_marginTop="15dp"/>
 
 </LinearLayout>

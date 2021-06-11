@@ -6,17 +6,25 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -25,13 +33,24 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.example.automativedoor.Control.ScheduleReceiver;
 import com.example.automativedoor.Control.UserController;
 import com.example.automativedoor.EntityClass.Sensor;
 import com.example.automativedoor.EntityClass.Servo;
 import com.example.automativedoor.EntityClass.Speaker;
 import com.example.automativedoor.GUIControl.ComponentAdapter;
+import com.example.automativedoor.GUIControl.TimerAdapter;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 
 public class Component extends AppCompatActivity {
@@ -43,7 +62,7 @@ public class Component extends AppCompatActivity {
 
     private ComponentAdapter adapter;
 
-    private UserController controller = UserController.getInstance();
+    private UserController controller;
 
     private ImageView sensor_btn;
     private ImageView servo_btn;
@@ -53,11 +72,86 @@ public class Component extends AppCompatActivity {
     private TextView speaker_txt;
     private SwipeRefreshLayout swipe;
 
-    private void sensorClick() { startActivityForResult(new Intent(this, pin.class), 1); }
+    private SwipeMenuListView schedule;
+    private TimerAdapter timerAdapter;
+    private JSONArray jsonArray = null;
 
-    private void speakerClick() { startActivityForResult(new Intent(this, pin.class), 2); }
+    private void sensorClick() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        ViewGroup viewGroup = findViewById(android.R.id.content);
+        View view = LayoutInflater.from(this).inflate(R.layout.sensor_mode, viewGroup, false);
+        builder.setView(view);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
 
-    private void servoClick() { startActivityForResult(new Intent(this, pin.class), 3); }
+        RadioButton anti_thief = (RadioButton) alertDialog.findViewById(R.id.sensor_anti_thief);
+        RadioButton welcome = (RadioButton) alertDialog.findViewById(R.id.sensor_welcome);
+        Button button = (Button) alertDialog.findViewById(R.id.sensor_confirm);
+        ImageView reminder = (ImageView) alertDialog.findViewById(R.id.sensor_reminder);
+
+        reminder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                startActivity(new Intent(getApplicationContext(), SetTimer.class));
+            }
+        });
+
+        TextView txt_mode = (TextView) findViewById(R.id.component_mode);
+        RelativeLayout layout = findViewById(R.id.component_layout_mode);
+        if (controller.getMode() == 2) {
+            anti_thief.setChecked(true);
+        }
+        else if (controller.getMode() == 1) {
+            welcome.setChecked(true);
+        }
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                int mode = 0;
+                if (anti_thief.isChecked()) {
+                    mode = 2;
+                    txt_mode.setText("Anti Thief");
+                    layout.setBackgroundResource(R.drawable.component_off);
+                }
+                else if (welcome.isChecked()) {
+                    mode = 1;
+                    txt_mode.setText("Welcome Guest");
+                    layout.setBackgroundResource(R.drawable.component_on);
+                }
+                controller.changeMode(mode);
+                refreshItem();
+            }
+        });
+    }
+
+    private void speakerClick() {
+//        Intent intent = new Intent(this, SpeakerView.class);
+//        startActivityForResult(intent, 1);
+        controller.loadHistory(2, "2021-06-12", 10);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    controller.latch.await();
+                    for (int i = 0; i < controller.servoHisList.length; i++) {
+                        Log.e("history " + i, controller.servoHisList[i].get(0).getSize() + "");
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 500);
+    }
+
+    private void servoClick() {
+        Intent intent = new Intent(this, ServoView.class);
+        startActivityForResult(intent, 2);
+    }
 
 
     @Override
@@ -66,10 +160,26 @@ public class Component extends AppCompatActivity {
         setContentView(R.layout.activity_component);
         Log.e("Component in state: ", "onCreate");
 
+        controller = UserController.getInstance();
         this.associate();
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+            @Override
+            public void create(SwipeMenu menu) {
+                SwipeMenuItem deleteItem = new SwipeMenuItem(getApplicationContext());
+                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xFF, 0xFF, 0xFF)));
+                deleteItem.setWidth(130);
+                deleteItem.setTitle("Delete");
+                deleteItem.setIcon(R.drawable.timer_del);
+                menu.addMenuItem(deleteItem);
+            }
+        };
+        schedule.setMenuCreator(creator);
 
         adapter = new ComponentAdapter(this, R.layout.stream_component, components, servos, speakers);
         listView.setAdapter(adapter);
+
+        timerAdapter = new TimerAdapter(this, R.layout.stream_set_timer, this.jsonArray);
+        schedule.setAdapter(timerAdapter);
 
         this.setUpButtonEvent();
     }
@@ -157,22 +267,98 @@ public class Component extends AppCompatActivity {
             txt_mode.setText("Welcome Guest");
             layout.setBackgroundResource(R.drawable.component_on);
         }
+
+
+        schedule.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                try {
+                    JSONObject object = jsonArray.getJSONObject(position);
+                    AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(getApplicationContext().ALARM_SERVICE);
+                    int idx = object.getInt("index");
+                    Intent intent = new Intent(getApplicationContext(), ScheduleReceiver.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), idx, intent, 0);
+                    alarmManager.cancel(pendingIntent);
+                    jsonArray.remove(position);
+                    controller.writeJson(jsonArray, "timer.json");
+                    refreshItem();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                return true;
+            }
+        });
+
+        schedule.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                try {
+                    JSONArray array = jsonArray;
+                    JSONObject object = array.getJSONObject(position);
+
+                    String dow = object.getString("dow");
+                    boolean[] dayofweek = {false, false, false, false, false, false, false};
+                    for (int i = 0; i < 7; i++) {
+                        if (dow.charAt(i) == '1') dayofweek[i] = true;
+                    }
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                    builder.setTitle("Repeat every");
+                    String[] items = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+                    builder.setMultiChoiceItems(items, dayofweek, new DialogInterface.OnMultiChoiceClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+
+                        }
+                    });
+                    builder.setPositiveButton("Confirm", null);
+
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.getListView().setEnabled(false);
+                    alertDialog.show();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 
     private void associate() {
-        listView = (ListView) findViewById(R.id.component_listview);
+        this.listView = (ListView) findViewById(R.id.component_listview);
+        this.schedule = (SwipeMenuListView) findViewById(R.id.component_timer_listview);
         this.servos = controller.servoList;
         this.speakers = controller.speakerList;
 
-        this.components = new ArrayList<com.example.automativedoor.EntityClass.Component>();
+        this.components = new ArrayList<>();
         this.components.addAll(this.speakers);
         this.components.addAll(this.servos);
+
+        TextView txt_mode = (TextView) findViewById(R.id.component_mode);
+        RelativeLayout layout = findViewById(R.id.component_layout_mode);
+        if (controller.getMode() == 2) {
+            txt_mode.setText("Anti Thief");
+            layout.setBackgroundResource(R.drawable.component_off);
+        }
+        else if (controller.getMode() == 1) {
+            txt_mode.setText("Welcome Guest");
+            layout.setBackgroundResource(R.drawable.component_on);
+        }
+
+        this.jsonArray = controller.readJson("timer.json");
     }
 
-    private void refreshItem() {
+    public void refreshItem() {
         this.associate();
         adapter = new ComponentAdapter(this, R.layout.stream_component, components, servos, speakers);
         listView.setAdapter(adapter);
+
+        timerAdapter = new TimerAdapter(this, R.layout.stream_set_timer, this.jsonArray);
+        schedule.setAdapter(timerAdapter);
+
     }
 
     @Override
@@ -196,8 +382,8 @@ public class Component extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-//        Log.e("Component in state: ", "onRestart");
         this.refreshItem();
+//        Log.e("Component in state: ", "onRestart");
     }
 
     @Override
@@ -218,162 +404,11 @@ public class Component extends AppCompatActivity {
 //        Log.e("Component in state: ", "onDestroy");
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (resultCode == AppCompatActivity.RESULT_OK) {
-            final String result = data.getStringExtra(pin.PIN_RESULT);
-            if (result.equals("pin correct")) {
-                if (requestCode == 1) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    ViewGroup viewGroup = findViewById(android.R.id.content);
-                    View view = LayoutInflater.from(this).inflate(R.layout.sensor_mode, viewGroup, false);
-                    builder.setView(view);
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-
-                    RadioButton anti_thief = (RadioButton) alertDialog.findViewById(R.id.sensor_anti_thief);
-                    RadioButton welcome = (RadioButton) alertDialog.findViewById(R.id.sensor_welcome);
-                    Button button = (Button) alertDialog.findViewById(R.id.sensor_confirm);
-                    ImageView reminder = (ImageView) alertDialog.findViewById(R.id.sensor_reminder);
-
-                    reminder.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            alertDialog.dismiss();
-                            startActivity(new Intent(getApplicationContext(), SetTimer.class));
-                        }
-                    });
-
-                    TextView txt_mode = (TextView) findViewById(R.id.component_mode);
-                    RelativeLayout layout = findViewById(R.id.component_layout_mode);
-                    if (controller.getMode() == 2) {
-                        anti_thief.setChecked(true);
-                    }
-                    else if (controller.getMode() == 1) {
-                        welcome.setChecked(true);
-                    }
-
-                    button.setOnClickListener(new View.OnClickListener() {
-                        @RequiresApi(api = Build.VERSION_CODES.O)
-                        @Override
-                        public void onClick(View v) {
-                            alertDialog.dismiss();
-                            int mode = 0;
-                            if (anti_thief.isChecked()) {
-                                mode = 2;
-                                txt_mode.setText("Anti Thief");
-                                layout.setBackgroundResource(R.drawable.component_off);
-                            }
-                            else if (welcome.isChecked()) {
-                                mode = 1;
-                                txt_mode.setText("Welcome Guest");
-                                layout.setBackgroundResource(R.drawable.component_on);
-                            }
-                            controller.changeMode(mode);
-                            refreshItem();
-                        }
-                    });
-                }
-                else if (requestCode == 2) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    ViewGroup viewGroup = findViewById(android.R.id.content);
-                    View view = LayoutInflater.from(this).inflate(R.layout.stream_speaker, viewGroup, false);
-                    builder.setView(view);
-                    builder.setPositiveButton("Ok", null);
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-
-                    Speaker speaker = controller.speakerList.get(0);
-                    TextView textView = alertDialog.findViewById(R.id.speaker_name);
-                    textView.setText(speaker.getName());
-
-                    SeekBar seekBar = alertDialog.findViewById(R.id.speaker_seekbar);
-                    seekBar.setProgress(speaker.getVolume());
-
-                    seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                        int progressChangedValue = 0;
-
-                        @Override
-                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                            progressChangedValue = progress;
-                        }
-
-                        @Override
-                        public void onStartTrackingTouch(SeekBar seekBar) {
-
-                        }
-
-                        @RequiresApi(api = Build.VERSION_CODES.O)
-                        @Override
-                        public void onStopTrackingTouch(SeekBar seekBar) {
-                            UserController.getInstance().setSpeaker(0, progressChangedValue);
-                        }
-                    });
-
-                }
-                else if (requestCode == 3) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    ViewGroup viewGroup = findViewById(android.R.id.content);
-                    View view = LayoutInflater.from(this).inflate(R.layout.stream_servo, viewGroup, false);
-                    builder.setView(view);
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-
-                    Servo servo = controller.servoList.get(0);
-                    Button close = alertDialog.findViewById(R.id.servo_close);
-                    Button open = alertDialog.findViewById(R.id.servo_open);
-                    TextView txt_name = alertDialog.findViewById(R.id.servo_name);
-
-                    txt_name.setText(servo.getName());
-                    open.setOnClickListener(new View.OnClickListener() {
-                        @RequiresApi(api = Build.VERSION_CODES.O)
-                        @Override
-                        public void onClick(View v) {
-                            open.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.bounce));
-                            Toast notify;
-                            if (UserController.getInstance().openDoor()) {
-                                notify = Toast.makeText(getApplicationContext(), "Door opened", Toast.LENGTH_SHORT);
-                                refreshItem();
-                            } else {
-                                notify = Toast.makeText(getApplicationContext(), "This door is already opened", Toast.LENGTH_SHORT);
-                            }
-                            new CountDownTimer(700, 1000) {
-                                public void onTick(long millisUntilFinished) {notify.show();}
-                                public void onFinish() {notify.cancel();}
-                            }.start();
-
-                        }
-                    });
-
-                    close.setOnClickListener(new View.OnClickListener() {
-                        @RequiresApi(api = Build.VERSION_CODES.O)
-                        @Override
-                        public void onClick(View v) {
-                            close.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.bounce));
-                            Toast notify;
-                            if (UserController.getInstance().closeDoor()) {
-                                notify = Toast.makeText(getApplicationContext(), "Door closed", Toast.LENGTH_SHORT);
-                                refreshItem();
-                            } else {
-                                notify = Toast.makeText(getApplicationContext(), "This door is already closed", Toast.LENGTH_SHORT);
-                            }
-                            new CountDownTimer(700, 1000) {
-                                public void onTick(long millisUntilFinished) {notify.show();}
-                                public void onFinish() {notify.cancel();}
-                            }.start();
-                        }
-                    });
-                }
-            }
-            else if (result.equals("disable")) {
-                String content = "Ai do dang co gang truy cap vao thiet bi cua ban!!! <br> Hay co chinh sach bao ve ma PIN cua ban. <br>";
-                content += "<h1>Smart Home App</h1>" +
-                        "<img src=\"https://img.docbao.vn/images/uploads/2019/11/11/xa-hoi/smart-home.jpg\" width=\"1000\" height=\"600\">";
-                controller.sendMail("Invalid Access", content);
-            }
+            refreshItem();
         }
     }
 

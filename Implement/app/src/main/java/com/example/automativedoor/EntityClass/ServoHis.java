@@ -14,6 +14,10 @@ public class ServoHis extends History {
         return this.timeList.get(index).cTime;
     }
 
+    public int getSize() {
+        return timeList.size();
+    }
+
     public void setTime(String oTime, String cTime) {
         Time time = new Time();
         time.oTime = oTime;

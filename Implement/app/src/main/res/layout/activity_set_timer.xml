@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SetTimer"
-    android:background="@color/blue_grey">
+    android:background="@color/gray">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,8 +24,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Time"
-            android:textSize="15dp"
+            android:text="Schedule Mode"
+            android:textSize="20dp"
             android:textColor="@color/white"
             android:layout_centerHorizontal="true"
             android:padding="20dp" />
@@ -42,28 +42,38 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/timer_border"
+        android:layout_marginTop="70dp">
+
+    </RelativeLayout>
+
     <LinearLayout
         android:id="@+id/setTimer_settimer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="70dp"
         android:orientation="vertical">
 
         <TimePicker
             android:id="@+id/setTimer_timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:theme="@style/MyTimePicker"
             android:timePickerMode="spinner" />
 
         <RelativeLayout
             android:id="@+id/setTimer_repeat"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="70dp"
             android:background="@drawable/timer_border"
             android:clickable="true"
             android:onClick="repeatClick"
-            android:padding="10dp">
+            android:padding="10dp"
+            android:layout_marginTop="10dp">
 
             <TextView
                 android:id="@+id/setTimer_txt_repeat"
@@ -73,24 +83,26 @@
                 android:textSize="20dp"
                 android:textColor="@color/white"
                 android:paddingLeft="10dp"
-                android:layout_alignParentLeft="true"/>
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"/>
 
             <TextView
                 android:id="@+id/setTimer_txt_repeat_val"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="none >"
+                android:text="no repeat >"
                 android:textSize="20dp"
                 android:textColor="#7FFFFFFF"
                 android:layout_alignParentRight="true"
-                android:paddingRight="10dp"/>
+                android:paddingRight="10dp"
+                android:layout_centerVertical="true"/>
 
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/setTimer_label"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="70dp"
             android:background="@drawable/timer_border"
             android:clickable="true"
             android:onClick="labelClick"
@@ -104,7 +116,8 @@
                 android:textSize="20dp"
                 android:textColor="@color/white"
                 android:paddingLeft="10dp"
-                android:layout_alignParentLeft="true"/>
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"/>
 
             <TextView
                 android:id="@+id/setTimer_txt_label_val"
@@ -114,14 +127,15 @@
                 android:textSize="20dp"
                 android:textColor="#7FFFFFFF"
                 android:layout_alignParentRight="true"
-                android:paddingRight="10dp"/>
+                android:paddingRight="10dp"
+                android:layout_centerVertical="true"/>
 
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/setTimer_action"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="71dp"
             android:background="@drawable/timer_border"
             android:clickable="true"
             android:onClick="labelClick"
@@ -130,11 +144,23 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Action"
+                android:text="MODE"
                 android:textSize="20dp"
                 android:textColor="@color/white"
                 android:paddingLeft="10dp"
-                android:layout_alignParentLeft="true"/>
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"/>
+
+            <TextView
+                android:id="@+id/setTimer_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome Guest"
+                android:layout_toLeftOf="@+id/setTimer_action_val"
+                android:layout_marginRight="10dp"
+                android:layout_centerVertical="true"
+                android:textColor="@color/green"
+                android:textSize="15dp" />
 
             <Switch
                 android:id="@+id/setTimer_action_val"
@@ -142,9 +168,8 @@
                 android:layout_height="wrap_content"
                 android:switchMinWidth="75dp"
                 android:layout_alignParentRight="true"
-                android:textOff="OFF"
-                android:textOn="ON"
-                android:showText="true"/>
+                android:background="@color/green"
+                android:layout_centerVertical="true"/>
 
         </RelativeLayout>
 
