@@ -33,6 +33,7 @@ public class SpeakerView extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.scale_y_out, 0);
         setContentView(R.layout.stream_speaker);
 
         speaker = controller.speakerList.get(0);
@@ -101,5 +102,11 @@ public class SpeakerView extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, R.anim.scale_y_in);
     }
 }

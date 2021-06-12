@@ -71,81 +71,21 @@ public class Component extends AppCompatActivity {
     private TextView servo_txt;
     private TextView speaker_txt;
     private SwipeRefreshLayout swipe;
+    private TextView txt_mode;
+    private RelativeLayout layout;
 
     private SwipeMenuListView schedule;
     private TimerAdapter timerAdapter;
     private JSONArray jsonArray = null;
 
     private void sensorClick() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        ViewGroup viewGroup = findViewById(android.R.id.content);
-        View view = LayoutInflater.from(this).inflate(R.layout.sensor_mode, viewGroup, false);
-        builder.setView(view);
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-
-        RadioButton anti_thief = (RadioButton) alertDialog.findViewById(R.id.sensor_anti_thief);
-        RadioButton welcome = (RadioButton) alertDialog.findViewById(R.id.sensor_welcome);
-        Button button = (Button) alertDialog.findViewById(R.id.sensor_confirm);
-        ImageView reminder = (ImageView) alertDialog.findViewById(R.id.sensor_reminder);
-
-        reminder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                startActivity(new Intent(getApplicationContext(), SetTimer.class));
-            }
-        });
-
-        TextView txt_mode = (TextView) findViewById(R.id.component_mode);
-        RelativeLayout layout = findViewById(R.id.component_layout_mode);
-        if (controller.getMode() == 2) {
-            anti_thief.setChecked(true);
-        }
-        else if (controller.getMode() == 1) {
-            welcome.setChecked(true);
-        }
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                int mode = 0;
-                if (anti_thief.isChecked()) {
-                    mode = 2;
-                    txt_mode.setText("Anti Thief");
-                    layout.setBackgroundResource(R.drawable.component_off);
-                }
-                else if (welcome.isChecked()) {
-                    mode = 1;
-                    txt_mode.setText("Welcome Guest");
-                    layout.setBackgroundResource(R.drawable.component_on);
-                }
-                controller.changeMode(mode);
-                refreshItem();
-            }
-        });
+        Intent intent = new Intent(this, SensorView.class);
+        startActivityForResult(intent, 0);
     }
 
     private void speakerClick() {
-//        Intent intent = new Intent(this, SpeakerView.class);
-//        startActivityForResult(intent, 1);
-        controller.loadHistory(2, "2021-06-12", 10);
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    controller.latch.await();
-                    for (int i = 0; i < controller.servoHisList.length; i++) {
-                        Log.e("history " + i, controller.servoHisList[i].get(0).getSize() + "");
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, 500);
+        Intent intent = new Intent(this, SpeakerView.class);
+        startActivityForResult(intent, 1);
     }
 
     private void servoClick() {
@@ -332,6 +272,8 @@ public class Component extends AppCompatActivity {
         this.schedule = (SwipeMenuListView) findViewById(R.id.component_timer_listview);
         this.servos = controller.servoList;
         this.speakers = controller.speakerList;
+        this.txt_mode = (TextView) findViewById(R.id.component_mode);
+        this.layout = (RelativeLayout) findViewById(R.id.component_layout_mode);
 
         this.components = new ArrayList<>();
         this.components.addAll(this.speakers);
@@ -349,6 +291,14 @@ public class Component extends AppCompatActivity {
         }
 
         this.jsonArray = controller.readJson("timer.json");
+        if (controller.getMode() == 1) {
+            this.txt_mode.setText("Welcome Guest");
+            this.layout.setBackgroundResource(R.drawable.component_on);
+        }
+        else if (controller.getMode() == 2) {
+            this.txt_mode.setText("Anti Thief");
+            this.layout.setBackgroundResource(R.drawable.component_off);
+        }
     }
 
     public void refreshItem() {

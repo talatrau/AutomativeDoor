@@ -23,4 +23,11 @@
     <string name="speaker">Speaker</string>
     <string name="pin">PinCode</string>
     <string name="pincreate">PinCreate</string>
+    
+    <string-array name="feedback">
+        <item>Product</item>
+        <item>Maintain Service</item>
+        <item>Mobile App</item>
+    </string-array>
+    <string name="feedback_default">Chose Category</string>
 </resources>

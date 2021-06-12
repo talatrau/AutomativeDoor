@@ -21,24 +21,26 @@ public class GeneralHistory extends AppCompatActivity {
     CalendarView calendar;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {    
         Log.wtf("GeneralHistory", "created");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.working_history_activity);
 
         //UserController.getInstance().loadHistory(0, "");
 
-        calendar = (CalendarView) findViewById(R.id.calendarHistory);
-        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-
-                LocalDate date = LocalDate.of(year, month+1, dayOfMonth);
-                Toast.makeText(GeneralHistory.this, date.toString(), Toast.LENGTH_LONG).show();
-                startActivity(new Intent(GeneralHistory.this, HistoryDetail.class));
-            }
-        });
+//        UserController.getInstance().loadHistory(UserController.getInstance().currentHisType, "");
+//        Log.wtf("Debug", String.format("GeneralHistory | currentHistype: %d", UserController.getInstance().currentHisType));
+//        calendar = (CalendarView) findViewById(R.id.calendarHistory);
+//        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+//            @RequiresApi(api = Build.VERSION_CODES.O)
+//            @Override
+//            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+//
+//                LocalDate date = LocalDate.of(year, month+1, dayOfMonth);
+//                Toast.makeText(GeneralHistory.this, date.toString(), Toast.LENGTH_LONG).show();
+//                startActivity(new Intent(GeneralHistory.this, HistoryDetail.class));
+//            }
+//        });
 
 
 

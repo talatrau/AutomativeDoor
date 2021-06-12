@@ -105,6 +105,7 @@ public class UserController {
     public ArrayList<Speaker> speakerList;
     public ArrayList<Servo> servoList;
     public CountDownLatch latch;
+    public int currentHisType; // 0: sensor 1: speaker 2: servo
 
     private UserController() {
         this.driver = new DatabaseDriver();
@@ -141,15 +142,15 @@ public class UserController {
     public void setMqttServer() {
         boolean flag = false;
         if (this.mqttServer_2 == null) {
-            this.mqttServer_2 = new MQTTServer(context, "MqttService1", "CongTuVu", "aio_aaiG65CmXYKMzww6AYtJEfkO34pb", "CongTuVu/feeds/automativedoor.sensorspeaker");
+            this.mqttServer_2 = new MQTTServer(context, "MqttService1", "CongTuVu", "", "CongTuVu/feeds/automativedoor.sensorspeaker");
             flag = true;
             this.trackingSensor(0);
         }
         if (this.mqttServer_1 == null) {
-            this.mqttServer_1 = new MQTTServer(context, "MqttService", "CongTuVu", "aio_aaiG65CmXYKMzww6AYtJEfkO34pb", "");
+            this.mqttServer_1 = new MQTTServer(context, "MqttService", "CongTuVu", "", "");
         }
         if (this.mqttServer_3 == null) {
-            this.mqttServer_3 = new MQTTServer(context, "MqttService2", "CongTuVu", "aio_aaiG65CmXYKMzww6AYtJEfkO34pb", "CongTuVu/feeds/automativedoor.sensorservo");
+            this.mqttServer_3 = new MQTTServer(context, "MqttService2", "CongTuVu", "", "CongTuVu/feeds/automativedoor.sensorservo");
             flag = true;
             this.trackingSensor(1);
         }
@@ -299,7 +300,7 @@ public class UserController {
         driver.writeFile(data.toString().getBytes(), file);
     }
 
-    public boolean sendResponse(int score, String text) {
+    public boolean sendResponse(int score, String text, String category) {
         String data = "";
         String[] tokens = text.toLowerCase().split("[^a-zA-Z]+");
         if (tokens.length > 0) {
@@ -324,8 +325,8 @@ public class UserController {
                     spamProb = spamProb * 0.3;
                     hamProb = hamProb * 0.7;
                     if (hamProb > spamProb) {
-                        Response response = new Response(score, text);
-                        driver.saveResponse(response);
+                        Response response = new Response(score, text, user.getEmail());
+                        driver.saveResponse(response, category);
                         return true;
                     }
                 } catch (Exception e) {
@@ -653,8 +654,8 @@ public class UserController {
             }
         }
 
-        public void saveResponse(Response response) {
-            DatabaseReference reference = database.getReference("Response").child(hash);
+        public void saveResponse(Response response, String catgory) {
+            DatabaseReference reference = database.getReference("Response").child(catgory).child(hash);
             reference.setValue(response);
         }
 

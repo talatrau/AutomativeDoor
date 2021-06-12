@@ -52,6 +52,9 @@
         <activity android:name=".ServoView"
             android:theme="@style/DialogActivity" />
 
+        <activity android:name=".SensorView"
+            android:theme="@style/DialogActivity" />
+
         <activity
             android:name=".forgot_pass"
             android:label="@string/forgot_pass" />
@@ -62,7 +65,7 @@
             android:name=".Component"
             android:label="@string/component" />
         <activity
-            android:name=".feedback"
+            android:name=".Feedback"
             android:label="@string/response" />
         <activity
             android:name=".History"

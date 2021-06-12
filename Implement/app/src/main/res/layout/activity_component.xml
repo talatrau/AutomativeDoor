@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blue_grey"
+    android:background="@drawable/background"
     tools:context=".Component">
 
     <TextView
@@ -14,6 +14,7 @@
         android:text="System State"
         android:textColor="@color/white"
         android:textSize="20dp"
+        android:textStyle="bold"
         android:gravity="center"
         android:layout_marginTop="35dp" />
 
@@ -75,6 +76,7 @@
         android:text="Mode Schedule"
         android:textColor="@color/white"
         android:textSize="20dp"
+        android:textStyle="bold"
         android:gravity="center"
         android:layout_marginTop="20dp"
         android:layout_below="@id/component_swipe"/>
@@ -153,7 +155,7 @@
                 android:textAlignment="center"
                 android:layout_gravity="center"
                 android:textColor="@color/black"
-                android:textSize="10sp"
+                android:textSize="15sp"
                 android:text="Door"
                 android:clickable="true" />
 
@@ -169,7 +171,7 @@
                 android:textAlignment="center"
                 android:layout_gravity="center"
                 android:textColor="@color/black"
-                android:textSize="10sp"
+                android:textSize="15sp"
                 android:text="Speaker"
                 android:clickable="true" />
 
@@ -185,7 +187,7 @@
                 android:textAlignment="center"
                 android:layout_gravity="center"
                 android:textColor="@color/black"
-                android:textSize="10sp"
+                android:textSize="15sp"
                 android:text="Mode"
                 android:clickable="true" />
 

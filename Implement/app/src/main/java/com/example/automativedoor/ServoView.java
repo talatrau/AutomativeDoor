@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -31,6 +32,7 @@ public class ServoView extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.scale_y_out, 0);
         setContentView(R.layout.stream_servo);
 
         servo = controller.servoList.get(0);
@@ -104,5 +106,11 @@ public class ServoView extends AppCompatActivity {
                 builder.create().show();
             }
         });
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, R.anim.scale_y_in);
     }
 }

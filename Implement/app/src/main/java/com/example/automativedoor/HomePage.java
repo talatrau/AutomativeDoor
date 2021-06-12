@@ -35,7 +35,7 @@ public class HomePage extends AppCompatActivity {
     }
 
     private void responseClick() {
-        Intent intent = new Intent(this, feedback.class);
+        Intent intent = new Intent(this, Feedback.class);
         startActivityForResult(intent, 0);
     }
 
@@ -44,6 +44,7 @@ public class HomePage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.fadeout, R.anim.fadein);
 
         setContentView(R.layout.activity_home_page);
         Log.e("Homepage in state: ", "onCreate");
@@ -168,7 +169,7 @@ public class HomePage extends AppCompatActivity {
 
         if (requestCode == 0)  {
             if (resultCode == AppCompatActivity.RESULT_CANCELED) {
-                Toast.makeText(this, "SPAM", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please try again after 60 seconds", Toast.LENGTH_SHORT).show();
                 response_bnt.setEnabled(false);
                 response_txt.setEnabled(false);
                 countDownTimer = new CountDownTimer(30000, 1000) {
