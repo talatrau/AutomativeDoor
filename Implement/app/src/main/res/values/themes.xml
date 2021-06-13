@@ -7,7 +7,7 @@
         <item name="colorAccent">@color/teal_200</item>
         <!-- Customize your theme here. -->
     </style>
-    
+
     <style name="MyTimePicker" parent="android:Widget.Material.Light.TimePicker">
         <item name="android:textColorPrimary">@color/light_yellow</item>
         <item name="colorControlNormal">@color/cyan</item>
@@ -18,5 +18,14 @@
         <item name="windowMinWidthMinor">95%</item>
         <item name="windowNoTitle">true</item>
     </style>
+
+    <style name="NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

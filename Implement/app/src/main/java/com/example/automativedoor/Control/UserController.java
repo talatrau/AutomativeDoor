@@ -106,6 +106,9 @@ public class UserController {
     public ArrayList<Servo> servoList;
     public CountDownLatch latch;
     public int currentHisType; // 0: sensor 1: speaker 2: servo
+    public int numberSpeaker = 1;
+    public int numberSensor = 2;
+    public int numberServo = 1;
 
     private UserController() {
         this.driver = new DatabaseDriver();
@@ -360,8 +363,15 @@ public class UserController {
                 latch = new CountDownLatch(num);
                 LocalDate pivot = LocalDate.parse(date);
                 for (int i = 0; i < num; i++) {
+                    if (typ == 0){
+                        sensorHisList[i] = null;
+                    } else if (typ == 1){
+                        speakerHisList[i] = null;
+                    } else{
+                        servoHisList[i] = null;
+                    }
                     String oldDate = pivot.minusDays(i).toString();
-                    driver.getHistory(typ, oldDate, i);
+                    driver.getHistory(typ, oldDate, num-1-i);
                 }
             }
         });

@@ -27,7 +27,6 @@ public class HistoryDetail extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.history_detail_activity);
-//        UserController.getInstance().loadHistory(0, 4);
 
 //        histories = UserController.getInstance().sensorHisList;
 //        HistAdapter histAdapter = new HistAdapter(HistoryDetail.this, R.layout.stream_tworound_history);
@@ -35,7 +34,7 @@ public class HistoryDetail extends AppCompatActivity {
 //
 //        listView = findViewById(R.id.listHistory);
 //        listView.setAdapter(histAdapter);
-        HistAdapter histAdapter = new HistAdapter(HistoryDetail.this, R.layout.stream_tworound_history);
+//        HistAdapter histAdapter = new HistAdapter(HistoryDetail.this, R.layout.stream_tworound_history);
 //        if (UserController.getInstance().currentHisType == 0) {
 //            sensorHistories = UserController.getInstance().sensorHisList;
 //            Log.wtf("Debug", "len: " + String.valueOf(sensorHistories.size()));
@@ -48,8 +47,25 @@ public class HistoryDetail extends AppCompatActivity {
 //            histAdapter.setListServoHis(servoHistories);
 //        }
 
-        listView = findViewById(R.id.listHistory);
-        listView.setAdapter(histAdapter);
+//        listView = findViewById(R.id.listHistory);
+//        listView.setAdapter(histAdapter);
+
+        for (int i = 0; i < 7; i ++){
+            if (UserController.getInstance().currentHisType == 2) {
+                if (UserController.getInstance().servoHisList[i] != null){
+                    Log.wtf("Hoang", String.format("servo %d days before: \n%d", i, UserController.getInstance().servoHisList[i].get(0).getSize()));
+                }
+            } else if (UserController.getInstance().currentHisType == 0) {
+                if (UserController.getInstance().sensorHisList[i] != null){
+                    Log.wtf("Hoang", String.format("number sensor: %d", UserController.getInstance().sensorHisList[i].size()));
+                    Log.wtf("Hoang", String.format("sensor %d days before: \n%d", i, UserController.getInstance().sensorHisList[i].get(1).obstacle.size()));
+                }
+            } else{
+                if (UserController.getInstance().speakerHisList[i] != null){
+                    Log.wtf("Hoang", String.format("speaker %d days before: \n%d", i, UserController.getInstance().speakerHisList[i].get(0).time.size()));
+                }
+            }
+        }
     }
 //    protected List<SensorHis> getSensorHist(){
 //        List<SensorHis> sensorHises = new ArrayList<>();
