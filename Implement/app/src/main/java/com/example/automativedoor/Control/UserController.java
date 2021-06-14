@@ -371,7 +371,7 @@ public class UserController {
                         servoHisList[i] = null;
                     }
                     String oldDate = pivot.minusDays(i).toString();
-                    driver.getHistory(typ, oldDate, num-1-i);
+                    driver.getHistory(typ, oldDate, i);
                 }
             }
         });

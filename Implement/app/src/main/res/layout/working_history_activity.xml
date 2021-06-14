@@ -14,4 +14,30 @@
         android:layout_height="wrap_content"
         tools:layout_editor_absoluteX="183dp"
         tools:layout_editor_absoluteY="330dp" />
+
+    <Button
+        android:padding="5dp"
+        android:textColor="@color/red"
+        android:background="@color/white"
+        android:id="@+id/statisticalBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/calendarHistory"
+        android:text="Statistical chart"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:padding="5dp"
+        android:id="@+id/showDetailBtn"
+        android:textColor="@color/red"
+        android:background="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/calendarHistory"
+        android:text="Show Detail"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="100dp"
+        android:layout_toRightOf="@id/statisticalBtn"/>
 </RelativeLayout>

@@ -2,7 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/deviceID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="ID: hoang"
+        android:textSize="18sp"
+        android:textStyle="bold" />
     <RelativeLayout
+        android:layout_marginLeft="10dp"
+        android:layout_below="@id/deviceID"
         android:id="@+id/startRegion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -43,6 +53,7 @@
     </RelativeLayout>
     <RelativeLayout
         android:id="@+id/endRegion"
+        android:layout_marginLeft="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/startRegion"

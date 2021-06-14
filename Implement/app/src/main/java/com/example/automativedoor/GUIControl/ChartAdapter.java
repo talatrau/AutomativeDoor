@@ -57,7 +57,7 @@ public class ChartAdapter extends BaseAdapter {
                 if (! hashMap.containsKey(tempSpeaker.deviceID)){
                     hashMap.put(tempSpeaker.deviceID, max_pos_current++);
                 }
-                speakerChartData[hashMap.get(tempSpeaker.deviceID)][d] = tempSpeaker.time.size();
+                speakerChartData[hashMap.get(tempSpeaker.deviceID)][num_day - 1 - d] = tempSpeaker.time.size();
             }
         }
         for (int i = 0; i < num_day; i ++){
@@ -80,7 +80,7 @@ public class ChartAdapter extends BaseAdapter {
                 if (! hashMap.containsKey(tempServo.deviceID)){
                     hashMap.put(tempServo.deviceID, max_pos_current++);
                 }
-                servoChartData[hashMap.get(tempServo.deviceID)][d] = tempServo.getSize();
+                servoChartData[hashMap.get(tempServo.deviceID)][num_day - 1 - d] = tempServo.getSize();
             }
         }
 
@@ -105,7 +105,7 @@ public class ChartAdapter extends BaseAdapter {
                 if (! hashMap.containsKey(tempSensor.deviceID)){
                     hashMap.put(tempSensor.deviceID, max_pos_current++);
                 }
-                sensorChartData[hashMap.get(tempSensor.deviceID)][d] = tempSensor.obstacle.size();
+                sensorChartData[hashMap.get(tempSensor.deviceID)][num_day - 1 - d] = tempSensor.obstacle.size();
             }
         }
 
