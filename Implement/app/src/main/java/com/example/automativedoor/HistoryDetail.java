@@ -47,6 +47,11 @@ public class HistoryDetail extends AppCompatActivity {
         return ret;
     }
     public ArrayList<String[]> getServoData(List<ServoHis> servoHisList){
+        if (servoHisList == null){
+            Log.wtf("Hoang", "sensor null roi");
+            return null;
+        }
+        Log.wtf("Hoang", String.valueOf(servoHisList.size()));
         Log.wtf("Debug", "getServoData ran");
         ArrayList<String[]> ret = new ArrayList<>();
         ServoHis tempServo;
@@ -58,7 +63,6 @@ public class HistoryDetail extends AppCompatActivity {
                 Log.wtf("Debug", "End time: " + tempServo.getCTime(s));
             }
             Log.wtf("Debug", "Device ID: " + tempServo.deviceID);
-            Log.wtf("Debug", "ret[0]: " + Arrays.toString(ret.get(0)));
 
         }
         Log.wtf("Debug", "end getServoData");
@@ -74,7 +78,6 @@ public class HistoryDetail extends AppCompatActivity {
                 Log.wtf("Debug", "Warning time: " + tempSpeaker.time.get(s));
             }
             Log.wtf("Debug", "Device ID: " + tempSpeaker.deviceID);
-            Log.wtf("Debug", "ret[0]: " + Arrays.toString(ret.get(0)));
 
         }
         Log.wtf("Debug", "end getServoData");
