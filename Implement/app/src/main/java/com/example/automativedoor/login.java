@@ -30,10 +30,12 @@ public class login extends AppCompatActivity {
 
     private UserController controller = UserController.getInstance();
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
 
         if (controller.fauth.getCurrentUser() != null) {
             controller.setup();
