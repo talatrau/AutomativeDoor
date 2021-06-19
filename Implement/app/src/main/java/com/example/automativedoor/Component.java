@@ -71,8 +71,10 @@ public class Component extends AppCompatActivity {
     private TextView servo_txt;
     private TextView speaker_txt;
     private SwipeRefreshLayout swipe;
-    private TextView txt_mode;
-    private RelativeLayout layout;
+    private TextView anti_txt;
+    private RelativeLayout anti_layout;
+    private TextView welcome_txt;
+    private RelativeLayout welcome_layout;
 
     private SwipeMenuListView schedule;
     private TimerAdapter timerAdapter;
@@ -197,18 +199,6 @@ public class Component extends AppCompatActivity {
             }
         });
 
-        TextView txt_mode = (TextView) findViewById(R.id.component_mode);
-        RelativeLayout layout = findViewById(R.id.component_layout_mode);
-        if (controller.getMode() == 2) {
-            txt_mode.setText("Anti Thief");
-            layout.setBackgroundResource(R.drawable.component_off);
-        }
-        else if (controller.getMode() == 1) {
-            txt_mode.setText("Welcome Guest");
-            layout.setBackgroundResource(R.drawable.component_on);
-        }
-
-
         schedule.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
@@ -272,33 +262,30 @@ public class Component extends AppCompatActivity {
         this.schedule = (SwipeMenuListView) findViewById(R.id.component_timer_listview);
         this.servos = controller.servoList;
         this.speakers = controller.speakerList;
-        this.txt_mode = (TextView) findViewById(R.id.component_mode);
-        this.layout = (RelativeLayout) findViewById(R.id.component_layout_mode);
+        this.anti_txt = (TextView) findViewById(R.id.anti_mode);
+        this.anti_layout = (RelativeLayout) findViewById(R.id.anti_thief);
+        this.welcome_layout = (RelativeLayout) findViewById(R.id.welcome_guest);
+        this.welcome_txt = (TextView) findViewById(R.id.welcome_mode);
 
         this.components = new ArrayList<>();
         this.components.addAll(this.speakers);
         this.components.addAll(this.servos);
 
-        TextView txt_mode = (TextView) findViewById(R.id.component_mode);
-        RelativeLayout layout = findViewById(R.id.component_layout_mode);
+
         if (controller.getMode() == 2) {
-            txt_mode.setText("Anti Thief");
-            layout.setBackgroundResource(R.drawable.component_off);
+            anti_txt.setText("ON");
+            anti_layout.setBackgroundResource(R.drawable.component_on);
+            welcome_txt.setText("OFF");
+            welcome_layout.setBackgroundResource(R.drawable.component_off);
         }
         else if (controller.getMode() == 1) {
-            txt_mode.setText("Welcome Guest");
-            layout.setBackgroundResource(R.drawable.component_on);
+            anti_txt.setText("OFF");
+            anti_layout.setBackgroundResource(R.drawable.component_off);
+            welcome_txt.setText("ON");
+            welcome_layout.setBackgroundResource(R.drawable.component_on);
         }
 
         this.jsonArray = controller.readJson("timer.json");
-        if (controller.getMode() == 1) {
-            this.txt_mode.setText("Welcome Guest");
-            this.layout.setBackgroundResource(R.drawable.component_on);
-        }
-        else if (controller.getMode() == 2) {
-            this.txt_mode.setText("Anti Thief");
-            this.layout.setBackgroundResource(R.drawable.component_off);
-        }
     }
 
     public void refreshItem() {

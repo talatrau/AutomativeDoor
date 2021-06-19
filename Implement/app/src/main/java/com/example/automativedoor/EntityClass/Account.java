@@ -1,5 +1,7 @@
 package com.example.automativedoor.EntityClass;
 
+import com.example.automativedoor.Control.UserController;
+
 public class Account {
     private String email;
     private String pass;
@@ -30,6 +32,7 @@ public class Account {
     }
 
     public boolean pinVerify(String pin) {
-        return this.pin.equals(pin);
+        String hash = UserController.md5Hash(pin);
+        return this.pin.equals(hash);
     }
 }

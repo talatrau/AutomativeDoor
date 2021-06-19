@@ -109,6 +109,7 @@ public class UserController {
     public int numberSpeaker = 1;
     public int numberSensor = 2;
     public int numberServo = 1;
+    public boolean pinSession = false;
 
     private UserController() {
         this.driver = new DatabaseDriver();
@@ -140,20 +141,22 @@ public class UserController {
                 e.printStackTrace();
             }
         }
+
+        pinSession = false;
     }
 
     public void setMqttServer() {
         boolean flag = false;
         if (this.mqttServer_2 == null) {
-            this.mqttServer_2 = new MQTTServer(context, "MqttService1", "CongTuVu", "", "CongTuVu/feeds/automativedoor.sensorspeaker");
+            this.mqttServer_2 = new MQTTServer(context, "MqttService1", "CongTuVu", "aio_jOmI46W3ACsHtlAxXTMBdED3Pbuy", "CongTuVu/feeds/automativedoor.sensorspeaker");
             flag = true;
             this.trackingSensor(0);
         }
         if (this.mqttServer_1 == null) {
-            this.mqttServer_1 = new MQTTServer(context, "MqttService", "CongTuVu", "", "");
+            this.mqttServer_1 = new MQTTServer(context, "MqttService", "CongTuVu", "aio_jOmI46W3ACsHtlAxXTMBdED3Pbuy", "");
         }
         if (this.mqttServer_3 == null) {
-            this.mqttServer_3 = new MQTTServer(context, "MqttService2", "CongTuVu", "", "CongTuVu/feeds/automativedoor.sensorservo");
+            this.mqttServer_3 = new MQTTServer(context, "MqttService2", "CongTuVu", "aio_jOmI46W3ACsHtlAxXTMBdED3Pbuy", "CongTuVu/feeds/automativedoor.sensorservo");
             flag = true;
             this.trackingSensor(1);
         }
@@ -443,7 +446,7 @@ public class UserController {
 
     }
 
-    private static String md5Hash(String input) {
+    public static String md5Hash(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] message = md.digest(input.getBytes());

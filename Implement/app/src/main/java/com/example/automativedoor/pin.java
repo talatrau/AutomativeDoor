@@ -160,6 +160,7 @@ public class pin extends AppCompatActivity {
                 Intent data = new Intent();
                 data.putExtra(PIN_RESULT, "pin correct");
                 setResult(AppCompatActivity.RESULT_OK, data);
+                controller.pinSession = true;
                 finish();
             }
             else {
@@ -188,7 +189,6 @@ public class pin extends AppCompatActivity {
 
         setWidgetInstance();
         setButtonOnclick();
-
     }
 
     @Override

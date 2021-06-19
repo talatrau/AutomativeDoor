@@ -94,7 +94,6 @@ public class SetTimer extends AppCompatActivity {
         };
 
         this.jsonArray = controller.readJson("timer.json");
-
         this.setEvent();
     }
 
@@ -118,20 +117,43 @@ public class SetTimer extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
+                    boolean conflict = false;
                     JSONObject object = getCurrentTimer();
-                    int index = (int) (System.currentTimeMillis() % 1000000000);
-                    object.put("index", index);
-                    jsonArray.put(object);
-                    controller.writeJson(jsonArray, "timer.json");
+                    Calendar calendar = Calendar.getInstance();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject iter = jsonArray.getJSONObject(i);
+                        if (iter.getInt("hour") == object.getInt("hour") && iter.getInt("minute") == object.getInt("minute")) {
+                            String object_dow = object.getString("dow");
+                            String iter_dow = iter.getString("dow");
+                            for (int j = 0; j < 7; j++) {
+                                if (object_dow.charAt(j) == iter_dow.charAt(j) && object_dow.charAt(j) == '1') {
+                                    conflict = true;
+                                    break;
+                                }
+                            }
+                            if (conflict) break;
+                        }
+                    }
 
-                    int hour = object.getInt("hour");
-                    int min = object.getInt("minute");
-                    int mode = object.getInt("mode");
-                    String dow = object.getString("dow");
+                    if (!conflict) {
+                        int index = (int) (System.currentTimeMillis() % 1000000000);
+                        object.put("index", index);
+                        jsonArray.put(object);
+                        controller.writeJson(jsonArray, "timer.json");
 
-                    schedule(dow, mode, hour, min, index);
-                    Toast.makeText(SetTimer.this, "Save Success!", Toast.LENGTH_LONG).show();
-                    finish();
+                        int hour = object.getInt("hour");
+                        int min = object.getInt("minute");
+                        int mode = object.getInt("mode");
+                        String dow = object.getString("dow");
+
+                        schedule(dow, mode, hour, min, index);
+                        Toast.makeText(SetTimer.this, "Save Success!", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(), "Conflict With Another", Toast.LENGTH_LONG).show();
+                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
