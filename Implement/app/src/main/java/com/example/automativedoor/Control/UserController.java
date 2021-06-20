@@ -97,6 +97,8 @@ public class UserController {
     public List<ServoHis>[] servoHisList;
     public List<SpeakerHis>[] speakerHisList;
 
+    public int[][] servoModeCount;
+
     final public FirebaseAuth fauth = FirebaseAuth.getInstance();
 
     public Context context;
@@ -734,5 +736,28 @@ public class UserController {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
         }
+    }
+
+    public ArrayList<String[]> getServoData(List<ServoHis> servoHisList){
+        if (servoHisList == null){
+            Log.wtf("Hoang", "sensor null roi");
+            return null;
+        }
+        Log.wtf("Hoang", String.valueOf(servoHisList.size()));
+        Log.wtf("Debug", "getServoData ran");
+        ArrayList<String[]> ret = new ArrayList<>();
+        ServoHis tempServo;
+        for (int i = 0; i < servoHisList.size(); i ++){
+            tempServo = servoHisList.get(i);
+            for (int s = 0; s < tempServo.getSize(); s ++) {
+                ret.add(new String[]{tempServo.deviceID, tempServo.getOTime(s), tempServo.getCTime(s)});
+                Log.wtf("Debug", "Start time: " + tempServo.getOTime(s));
+                Log.wtf("Debug", "End time: " + tempServo.getCTime(s));
+            }
+            Log.wtf("Debug", "Device ID: " + tempServo.deviceID);
+
+        }
+        Log.wtf("Debug", "end getServoData");
+        return ret;
     }
 }

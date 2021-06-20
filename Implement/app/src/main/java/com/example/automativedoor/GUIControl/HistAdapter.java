@@ -106,7 +106,7 @@ public class HistAdapter extends BaseAdapter {
             TextView deviceID = convertView.findViewById(R.id.deviceID);
 
             date.setText(data[1].substring(0, 10));
-            time.setText(data[1].substring(10));
+            time.setText(data[1].substring(11));
             deviceID.setText(data[0]);
 
         }
@@ -122,10 +122,10 @@ public class HistAdapter extends BaseAdapter {
             TextView deviceID = convertView.findViewById(R.id.deviceID);
 
             dateStart.setText(data[1].substring(0, 10));
-            timeStart.setText(data[1].substring(10));
+            timeStart.setText(data[1].substring(11));
 
             dateEnd.setText(data[2].substring(0, 10));
-            timeEnd.setText(data[2].substring(10));
+            timeEnd.setText(data[2].substring(11));
             deviceID.setText(data[0]);
         } else {
             String[] data = listSensorHis.get(position);
@@ -136,7 +136,7 @@ public class HistAdapter extends BaseAdapter {
             TextView deviceID = convertView.findViewById(R.id.deviceID);
 
             date.setText(data[1].substring(0, 10));
-            time.setText(data[1].substring(10));
+            time.setText(data[1].substring(11));
             deviceID.setText(data[0]);
         }
 //            times = getData(listServoHis.get(position));
@@ -171,7 +171,7 @@ public class HistAdapter extends BaseAdapter {
         TextView time = convertView.findViewById(R.id.time);
 
         date.setText(sTime.substring(0, 10));
-        time.setText(sTime.substring(10));
+        time.setText(sTime.substring(11));
         return convertView;
     }
     private View twoLine(View convertView, String sTime, String eTime){
@@ -182,10 +182,10 @@ public class HistAdapter extends BaseAdapter {
         TextView timeEnd = convertView.findViewById(R.id.timeEnd);
 
         dateStart.setText(sTime.substring(0, 10));
-        timeStart.setText(sTime.substring(10));
+        timeStart.setText(sTime.substring(11));
 
         dateEnd.setText(eTime.substring(0, 10));
-        timeEnd.setText(eTime.substring(10));
+        timeEnd.setText(eTime.substring(11));
         return convertView;
     }
 }

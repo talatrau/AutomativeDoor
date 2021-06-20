@@ -34,7 +34,7 @@
             android:layout_below="@id/startStatus"
             android:paddingVertical="5dp"
             android:text="Date"
-            android:textColor="#4F4848"
+            android:textColor="#BCBBBB"
             android:textSize="16sp"
             android:textStyle="italic" />
 
@@ -47,7 +47,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginRight="30dp"
             android:text="Hour"
-            android:textColor="#4F4848"
+            android:textColor="#BCBBBB"
             android:textSize="16sp"
             android:textStyle="italic" />
     </RelativeLayout>
@@ -75,7 +75,7 @@
             android:layout_below="@id/endStatus"
             android:paddingVertical="5dp"
             android:text="Date"
-            android:textColor="#4F4848"
+            android:textColor="#BCBBBB"
             android:textSize="16sp"
             android:textStyle="italic" />
 
@@ -88,7 +88,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginRight="30dp"
             android:text="Hour"
-            android:textColor="#4F4848"
+            android:textColor="#BCBBBB"
             android:textSize="16sp"
             android:textStyle="italic" />
     </RelativeLayout>

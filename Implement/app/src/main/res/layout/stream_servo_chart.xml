@@ -21,11 +21,28 @@
         android:layout_marginTop="20dp"
         android:background="#434F93" />
 
+    <TextView
+        android:id="@+id/text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linechart"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="30dp"
+        android:text="History each mode" />
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChart"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_below="@id/text2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp" />
+
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="5dp"
-        android:layout_below="@id/linechart"
+        android:layout_below="@id/pieChart"
         android:background="?android:attr/listDivider"
         android:backgroundTint="#F5F5F5" />
 

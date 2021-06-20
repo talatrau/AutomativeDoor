@@ -21,7 +21,7 @@ import java.util.Date;
 
 
 public class History extends AppCompatActivity {
-    Button servoBtn, buzzerBtn, sensorBtn;
+    Button servoBtn, buzzerBtn;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -31,7 +31,7 @@ public class History extends AppCompatActivity {
 
         servoBtn = (Button) findViewById(R.id.servoBtn);
         buzzerBtn = (Button) findViewById(R.id.buzzerBtn);
-        sensorBtn = (Button) findViewById(R.id.sensorBtn);
+//        sensorBtn = (Button) findViewById(R.id.sensorBtn);
 
         servoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,14 +49,14 @@ public class History extends AppCompatActivity {
                 startActivity(new Intent(History.this, GeneralHistory.class));
             }
         });
-        sensorBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UserController.getInstance().currentHisType = 0;
-                Log.wtf("Debug", "History | currentHisType:" + String.valueOf(UserController.getInstance().currentHisType));
-                startActivity(new Intent(History.this, GeneralHistory.class));
-            }
-        });
+//        sensorBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                UserController.getInstance().currentHisType = 0;
+//                Log.wtf("Debug", "History | currentHisType:" + String.valueOf(UserController.getInstance().currentHisType));
+//                startActivity(new Intent(History.this, GeneralHistory.class));
+//            }
+//        });
 
 //        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 //        Log.wtf("Debug", "Current time: " + formatter.format(new Date()));

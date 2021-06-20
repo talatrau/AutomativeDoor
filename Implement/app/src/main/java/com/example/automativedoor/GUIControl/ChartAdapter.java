@@ -13,10 +13,15 @@ import com.example.automativedoor.EntityClass.ServoHis;
 import com.example.automativedoor.EntityClass.SpeakerHis;
 import com.example.automativedoor.R;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -33,7 +38,10 @@ public class ChartAdapter extends BaseAdapter {
     int [][] servoChartData;
     int [][] sensorChartData;
 
+
     static int max_pos_current;
+
+    int [][] servoPieData;
 
 
     public ChartAdapter(Context _context, int _layout, int _typ){
@@ -65,7 +73,9 @@ public class ChartAdapter extends BaseAdapter {
         }
     }
 
+
     public void setServo(List<ServoHis>[] servoHisList, int num_day){
+        UserController.getInstance().servoModeCount = new int[UserController.getInstance().numberServo][2];
         Log.wtf("Debug", "setServo ran");
         number_day = num_day;
         hashMap = new Hashtable<String, Integer>();
@@ -75,13 +85,26 @@ public class ChartAdapter extends BaseAdapter {
 
         ServoHis tempServo;
         for (int d = 0; d < num_day; d ++){
+            Log.wtf("Hoang_Debug", String.format("day %d", d + 1));
             for (int i = 0; i < servoHisList[d].size(); i ++){
                 tempServo = servoHisList[d].get(i);
                 if (! hashMap.containsKey(tempServo.deviceID)){
                     hashMap.put(tempServo.deviceID, max_pos_current++);
                 }
                 servoChartData[hashMap.get(tempServo.deviceID)][num_day - 1 - d] = tempServo.getSize();
+
+                Log.wtf("Hoang_Debug", String.format("device: %s", tempServo.deviceID));
+
+                for (int t = 0; t < tempServo.getSize(); t ++){
+                    String time = tempServo.getOTime(t);
+                    int mode = Character.getNumericValue(time.charAt(time.length() - 1));
+//                    Log.wtf("Hoang_Debug", String.format("mode: %d", mode));
+                    UserController.getInstance().servoModeCount[hashMap.get(tempServo.deviceID)][mode - 1] += 1;
+                }
             }
+        }
+        for (int i =0; i < UserController.getInstance().numberServo; i ++){
+            Log.wtf("Debug_Hoang", String.format("i: %d, 0: %d, 1: %d", i, UserController.getInstance().servoModeCount[i][0], UserController.getInstance().servoModeCount[i][1]));
         }
 
         for (int i = 0; i < num_day; i ++){
@@ -160,6 +183,21 @@ public class ChartAdapter extends BaseAdapter {
             LineChart lineChart = convertView.findViewById(R.id.linechart);
             lineChart.setData(my_data);
             lineChart.invalidate();
+
+            int[]  modeCount  = UserController.getInstance().servoModeCount[position];
+            PieChart pieChart = convertView.findViewById(R.id.pieChart);
+
+            List<PieEntry> value = new ArrayList<>();
+            value.add(new PieEntry(modeCount[0], "Welcome Mode"));
+            value.add(new PieEntry(modeCount[1], "Anti theft Mode"));
+
+            PieDataSet pieDataSet = new PieDataSet(value, "PieChart Name");
+            PieData pieData = new PieData(pieDataSet);
+
+            pieChart.setData(pieData);
+            pieDataSet.setColors(ColorTemplate.JOYFUL_COLORS);
+
+
         } else {
             ArrayList<Entry> data = getListEntries(sensorChartData[position]);
             LineDataSet lineDataSet = new LineDataSet(data, "Sensor");

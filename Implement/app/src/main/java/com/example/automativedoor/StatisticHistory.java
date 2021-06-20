@@ -39,7 +39,7 @@ public class StatisticHistory extends AppCompatActivity {
             chartAdapter = new ChartAdapter(this, R.layout.stream_line_chart, 1);
             chartAdapter.setSpeaker(UserController.getInstance().speakerHisList, 7);
         } else if (UserController.getInstance().currentHisType == 2) {
-            chartAdapter = new ChartAdapter(this, R.layout.stream_line_chart, 2);
+            chartAdapter = new ChartAdapter(this, R.layout.stream_servo_chart, 2);
             chartAdapter.setServo(UserController.getInstance().servoHisList, 7);
         } else{
             chartAdapter = new ChartAdapter(this, R.layout.stream_line_chart, 0);

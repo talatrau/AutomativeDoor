@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.automativedoor.Control.UserController;
 
@@ -34,7 +35,19 @@ public class GeneralHistory extends AppCompatActivity {
         Log.wtf("GeneralHistory", "created");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.working_history_activity);
-        timer = new Timer();
+
+        final SwipeRefreshLayout pullToRefresh = findViewById(R.id.swipeContainer);
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+//                refreshData(); // your code
+                Toast.makeText(getApplicationContext(), "Works!", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(GeneralHistory.this, GeneralHistory.class);
+                startActivity(intent);
+                finish();
+                pullToRefresh.setRefreshing(false);
+            }
+        });
 
 
         UserController.getInstance().loadHistory(UserController.getInstance().currentHisType, LocalDate.now().toString(), 7);
@@ -56,14 +69,14 @@ public class GeneralHistory extends AppCompatActivity {
                 date = LocalDate.of(year, month+1, dayOfMonth);
                 Toast.makeText(GeneralHistory.this, date.toString(), Toast.LENGTH_LONG).show();
                 UserController.getInstance().loadHistory(UserController.getInstance().currentHisType, date.toString(), 1);
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(GeneralHistory.this, GeneralHistory.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }, 6000);
+//                timer.schedule(new TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        Intent intent = new Intent(GeneralHistory.this, GeneralHistory.class);
+//                        startActivity(intent);
+//                        finish();
+//                    }
+//                }, 8000);
 //                try {
 //                    UserController.getInstance().latch.await();
 //                    Log.wtf("Hoang", "Latch Completed");
