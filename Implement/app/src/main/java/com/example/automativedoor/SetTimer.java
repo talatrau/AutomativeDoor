@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.Buffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
@@ -94,7 +95,6 @@ public class SetTimer extends AppCompatActivity {
         };
 
         this.jsonArray = controller.readJson("timer.json");
-
         this.setEvent();
     }
 
@@ -118,20 +118,65 @@ public class SetTimer extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
+                    boolean conflict = false;
                     JSONObject object = getCurrentTimer();
-                    int index = (int) (System.currentTimeMillis() % 1000000000);
-                    object.put("index", index);
-                    jsonArray.put(object);
-                    controller.writeJson(jsonArray, "timer.json");
+                    Calendar calendar = Calendar.getInstance();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject iter = jsonArray.getJSONObject(i);
+                        if (iter.getInt("hour") == object.getInt("hour") && iter.getInt("minute") == object.getInt("minute")) {
+                            String object_dow = object.getString("dow");
+                            String iter_dow = iter.getString("dow");
+                            if (object_dow.equals(iter_dow)) conflict = true;
+                            else if (object_dow.equals("0000000")) {
+                                int sys_hm = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
+                                int obj_hm = object.getInt("hour") * 60 + object.getInt("minute");
+                                int dow = sys_hm > obj_hm ? calendar.get(Calendar.DAY_OF_WEEK) % 7 : calendar.get(Calendar.DAY_OF_WEEK) - 1;
+                                for (int j = 0; j < 7; j++) {
+                                    if (iter_dow.charAt(j) == '1' && j == dow) {
+                                        conflict = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            else if (iter_dow.equals("0000000")) {
+                                for (int j = 0; j < 7; j++) {
+                                    if (object_dow.charAt(i) == '1' && j == calendar.get(Calendar.DAY_OF_WEEK) - 1) {
+                                        conflict = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            else {
+                                for (int j = 0; j < 7; j++) {
+                                    if (object_dow.charAt(j) == iter_dow.charAt(j) && object_dow.charAt(j) == '1') {
+                                        conflict = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (conflict) break;
+                        }
+                    }
 
-                    int hour = object.getInt("hour");
-                    int min = object.getInt("minute");
-                    int mode = object.getInt("mode");
-                    String dow = object.getString("dow");
+                    if (!conflict) {
+                        int index = (int) (System.currentTimeMillis() % 1000000000);
+                        object.put("index", index);
+                        jsonArray.put(object);
+                        controller.writeJson(jsonArray, "timer.json");
 
-                    schedule(dow, mode, hour, min, index);
-                    Toast.makeText(SetTimer.this, "Save Success!", Toast.LENGTH_LONG).show();
-                    finish();
+                        int hour = object.getInt("hour");
+                        int min = object.getInt("minute");
+                        int mode = object.getInt("mode");
+                        String dow = object.getString("dow");
+
+                        schedule(dow, mode, hour, min, index);
+                        Toast.makeText(SetTimer.this, "Save Success!", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(), "Conflict With Another", Toast.LENGTH_LONG).show();
+                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

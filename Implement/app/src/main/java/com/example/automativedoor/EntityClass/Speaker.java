@@ -13,8 +13,6 @@ import java.time.format.DateTimeFormatter;
 
 public class Speaker extends Component {
 
-    SpeakerHis speakerHis;
-
     private int volume;
 
     public int getVolume() {

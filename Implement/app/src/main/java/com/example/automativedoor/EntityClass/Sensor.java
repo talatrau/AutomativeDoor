@@ -16,9 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class Sensor extends Component {
-
-    SensorHis sensorHis;
+public class    Sensor extends Component {
 
     private int position;
     private int mode;

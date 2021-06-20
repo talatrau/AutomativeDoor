@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.automativedoor.Control.UserController;
 
@@ -20,6 +21,7 @@ public class PinCreate extends AppCompatActivity {
     Button btn_1, btn_2, btn_3, btn_4, btn_5, btn_6, btn_7, btn_8, btn_9;
 
     private String pinCode = "";
+    private String pinConfirm = "";
 
     private void setWidgetInstance() {
         btn_1 = (Button) findViewById(R.id.pin_1);
@@ -156,22 +158,16 @@ public class PinCreate extends AppCompatActivity {
 
     private void pinCodeVerify() {
         if (pinCode.length() == 6) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Your PIN code is");
-            builder.setMessage(pinCode);
-            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    controller.user.setPin(pinCode);
+            if (pinConfirm.length() == 6) {
+                if (pinConfirm.equals(pinCode)) {
+                    String hash = UserController.md5Hash(pinConfirm);
+                    controller.user.setPin(hash);
                     controller.updateUser();
                     startActivity(new Intent(getApplicationContext(), HomePage.class));
                     finish();
                 }
-            });
-
-            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+                else {
+                    pinConfirm = "";
                     pinCode = "";
                     txt_1.setText("");
                     txt_2.setText("");
@@ -179,10 +175,23 @@ public class PinCreate extends AppCompatActivity {
                     txt_4.setText("");
                     txt_5.setText("");
                     txt_6.setText("");
+                    label.setText("Create your PIN code");
+                    Toast.makeText(this, "PIN not match", Toast.LENGTH_LONG).show();
                 }
-            });
+            }
 
-            builder.create().show();
+            else {
+                this.pinConfirm = this.pinCode;
+                this.pinCode = "";
+                txt_1.setText("");
+                txt_2.setText("");
+                txt_3.setText("");
+                txt_4.setText("");
+                txt_5.setText("");
+                txt_6.setText("");
+                label.setText("Confirm your PIN code");
+            }
+
         }
     }
 

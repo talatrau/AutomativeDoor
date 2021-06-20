@@ -26,8 +26,12 @@ public class HomePage extends AppCompatActivity {
     private UserController controller = UserController.getInstance();
 
     private void componentClick() {
-        Intent intent = new Intent(this, pin.class);
-        startActivityForResult(intent, 1);
+        if (controller.pinSession) {
+            startActivity(new Intent(this, Component.class));
+        } else {
+            Intent intent = new Intent(this, pin.class);
+            startActivityForResult(intent, 1);
+        }
     }
 
     private void historyClick() {
@@ -192,6 +196,7 @@ public class HomePage extends AppCompatActivity {
                 final String result = data.getStringExtra(pin.PIN_RESULT);
                 if (result.equals("pin correct")) startActivity(new Intent(this, Component.class));
                 else {
+                    Toast.makeText(this, "Please try again after 30 seconds", Toast.LENGTH_LONG).show();
                     String content = "Ai do dang co gang truy cap vao thiet bi cua ban!!! <br> Hay co chinh sach bao ve ma PIN va tai khoan cua ban. <br>";
                     content += "<h1>Smart Home App</h1>" +
                             "<img src=\"https://img.docbao.vn/images/uploads/2019/11/11/xa-hoi/smart-home.jpg\" width=\"1000\" height=\"600\">";

@@ -85,8 +85,7 @@ public class ChartAdapter extends BaseAdapter {
 
         ServoHis tempServo;
         for (int d = 0; d < num_day; d ++){
-            Log.wtf("Hoang_Debug", String.format("day %d", d + 1));
-            for (int i = 0; i < servoHisList[d].size(); i ++){
+            for (int i = 0; i < servoHisList[d].size(); i++){
                 tempServo = servoHisList[d].get(i);
                 if (! hashMap.containsKey(tempServo.deviceID)){
                     hashMap.put(tempServo.deviceID, max_pos_current++);
