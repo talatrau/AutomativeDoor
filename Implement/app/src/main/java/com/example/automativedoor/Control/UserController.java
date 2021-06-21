@@ -359,13 +359,13 @@ public class UserController {
         else if (typ == 2) {
             servoHisList = new ArrayList[num];
         }
-        latch = new CountDownLatch(num);
+
         Handler handler = new Handler();
         handler.post(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
-//                latch = new CountDownLatch(num);
+                latch = new CountDownLatch(num);
                 LocalDate pivot = LocalDate.parse(date);
                 for (int i = 0; i < num; i++) {
                     if (typ == 0){
@@ -380,6 +380,7 @@ public class UserController {
                 }
             }
         });
+
     }
 
 
