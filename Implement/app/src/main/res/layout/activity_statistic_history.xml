@@ -4,6 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#009688"
+    android:backgroundTint="#854646"
+    android:backgroundTintMode="multiply">
     tools:context=".StatisticHistory">
 
 

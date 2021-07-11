@@ -10,16 +10,19 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="20dp"
-        android:text="Statistic Chart" />
+        android:text="Statistic Chart"
+        android:textColor="#FEFEFE"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/linechart"
-        android:layout_width="300dp"
+        android:layout_width="350dp"
         android:layout_height="250dp"
         android:layout_below="@id/text1"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:background="#434F93" />
+        android:background="#CCD3C8" />
 
     <TextView
         android:id="@+id/text2"
@@ -28,7 +31,10 @@
         android:layout_below="@id/linechart"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="30dp"
-        android:text="History each mode" />
+        android:text="History each mode"
+        android:textColor="#FEFEFE"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/pieChart"
