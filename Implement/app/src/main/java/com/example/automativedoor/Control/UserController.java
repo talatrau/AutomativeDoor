@@ -23,6 +23,7 @@ import com.example.automativedoor.EntityClass.ServoHis;
 import com.example.automativedoor.EntityClass.Speaker;
 import com.example.automativedoor.EntityClass.SpeakerHis;
 import com.example.automativedoor.R;
+import com.google.android.gms.common.util.ArrayUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -56,6 +57,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import java.util.Properties;
@@ -312,31 +314,45 @@ public class UserController {
         String data = "";
         String[] tokens = text.toLowerCase().split("[^a-zA-Z]+");
         if (tokens.length > 0) {
-            InputStream inputStream = context.getResources().openRawResource(R.raw.spam);
+            InputStream inputStream = context.getResources().openRawResource(R.raw.bayes);
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             if (inputStream != null) {
                 try {
-                    double spamProb = 1;
-                    double hamProb = 1;
+                    double spamProb = Math.log(0.3);
+                    double hamProb = Math.log(0.7);
+                    ArrayList<String> skipwords = new ArrayList<>(
+                            Arrays.asList("of", "the", "a", "an", "and", "or", "to", "is", "are", "was", "were", "not", "am"));
+                    ArrayList<String> words = new ArrayList<>();
+                    ArrayList<Double> spams = new ArrayList<>();
+                    ArrayList<Double> hams = new ArrayList<>();
+
                     while ((data = reader.readLine()) != null) {
                         String[] split = data.split("\t");
-                        String word = split[0];
-                        for (int i = 0; i < tokens.length; i++) {
-                            if (tokens[i].equals(word)) {
-                                double spam = Double.parseDouble(split[2]) * 10000;
-                                double ham = Double.parseDouble(split[1]) * 10000;
-                                spamProb = spamProb * spam;
-                                hamProb = hamProb * ham;
+                        words.add(split[0]);
+                        spams.add(Double.parseDouble(split[2]));
+                        hams.add(Double.parseDouble(split[1]));
+                    }
+                    reader.close();
+
+                    for (int i = 0; i < tokens.length; i++) {
+                        if (!skipwords.contains(tokens[i])) {
+                            int index = words.indexOf(tokens[i]);
+                            if (index == -1) {
+                                spamProb += spams.get(0);
+                                hamProb += hams.get(0);
+                            } else {
+                                spamProb += spams.get(index);
+                                hamProb += hams.get(index);
                             }
                         }
                     }
-                    spamProb = spamProb * 0.3;
-                    hamProb = hamProb * 0.7;
+                    Log.e("" + hamProb, "" + spamProb);
                     if (hamProb > spamProb) {
                         Response response = new Response(score, text, user.getEmail());
                         driver.saveResponse(response, category);
                         return true;
                     }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
